@@ -23,7 +23,7 @@ $('document').ready(function() {
     $.post('http://localhost:3000/authenticate',
       {
         peerId: peerId,
-        sessionToken: '4CXS0f19nvMJBYK05o3toTWtZF5Lfd2t6Ikr2lID'
+        sessionToken: 'session_token'
       }, function (credential) {
         // $('#result').text(JSON.stringify(credential, null, 2));
 
