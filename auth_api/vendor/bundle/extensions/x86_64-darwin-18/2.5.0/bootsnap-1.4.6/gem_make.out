@@ -1,0 +1,15 @@
+current directory: /Users/yoneda_takahito/Desktop/auth_api/vendor/bundle/gems/bootsnap-1.4.6/ext/bootsnap
+/Users/yoneda_takahito/.rbenv/versions/2.5.1/bin/ruby -r ./siteconf20200502-79648-19s13a7.rb extconf.rb
+creating Makefile
+
+current directory: /Users/yoneda_takahito/Desktop/auth_api/vendor/bundle/gems/bootsnap-1.4.6/ext/bootsnap
+make "DESTDIR=" clean
+
+current directory: /Users/yoneda_takahito/Desktop/auth_api/vendor/bundle/gems/bootsnap-1.4.6/ext/bootsnap
+make "DESTDIR="
+compiling bootsnap.c
+linking shared-object bootsnap/bootsnap.bundle
+
+current directory: /Users/yoneda_takahito/Desktop/auth_api/vendor/bundle/gems/bootsnap-1.4.6/ext/bootsnap
+make "DESTDIR=" install
+/usr/bin/install -c -m 0755 bootsnap.bundle ./.gem.20200502-79648-qnhv1t/bootsnap
