@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
 import { Link } from 'react-router-dom';
 import { Path } from '../routes';
@@ -11,6 +11,8 @@ import {State} from "../reducers";
 const App: React.FC = () => {
 
     const dispatch = useDispatch();
+
+    const [isModalOpen, toggleModal] = useState(false);
 
     const { roomUrl } = useSelector((state: State) => ({
         roomUrl: state.room.roomUrl,
@@ -25,12 +27,25 @@ const App: React.FC = () => {
                     <CreateRoomButton
                         onClick={event => {
                             event.preventDefault();
-                            dispatch(RoomActions.getRoomUrl({peerId: `peerID_${Math.floor((Math.random() * 100) + 1)}`, sessionToken: "gaga"}))
+                            dispatch(RoomActions.getRoomUrl({peerId: `${Math.floor((Math.random() * 100000000) + 1)}`, sessionToken: "gaga"}))
+                            toggleModal(true)
                         }}
                     >
                         オンライン面接用のURLを発行する
-                        {roomUrl}
                     </CreateRoomButton>
+                    <Mask style={{display: isModalOpen ? "block" : "none"}}/>
+                    <Modal style={{display: isModalOpen ? "block" : "none"}}>
+                        <ModalContent>こちらがオンライン面接用のURLです</ModalContent>
+                        <RoomLink to={`rooms/${roomUrl}`}>http://localhost:3333/rooms/{roomUrl}</RoomLink>
+                        <CloseModal
+                            onClick={event => {
+                                event.preventDefault();
+                                toggleModal(false)
+                            }}
+                        >
+                            閉じる
+                        </CloseModal>
+                    </Modal>
                     {/*<OtameshiLink to={Path.otameshi}>お試しページへのリンク</OtameshiLink>*/}
                 </Header>
             </Wrapper>
@@ -99,9 +114,52 @@ const CreateRoomButton = styled.button`
   }
 `;
 
+const Mask = styled.div`
+  background: rgba(0, 0, 0, 0.4);
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  z-index: 1;
+`;
 
-const Text = styled.p``;
+const Modal = styled.section`
+  background: #fff;
+  color: #555;
+  width: 300px;
+  padding: 40px;
+  border-radius: 4px;
+  position: absolute;
+  top: 40px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  z-index: 2;
+`;
 
-const CodeText = styled.code``;
+const ModalContent = styled.p`
+  margin: 0 0 20px;
+  font-size: 16px;
+`;
+
+const RoomLink = styled(Link)`
+  font-size: 16px;
+  margin-top: 30px;
+`;
+
+const CloseModal = styled.div`
+　font-size: 16px;
+  cursor: pointer;
+  width: 200px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  text-align: center;
+  padding: 12px;
+  margin: 16px auto 0;
+  background: #1E90FF;
+  color: white;
+`;
+
 
 export default App;

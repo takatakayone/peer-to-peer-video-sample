@@ -15,3 +15,8 @@ export interface ResponsePeerAuthenticateInfo {
     timeStamp: number
     ttl: number
 }
+
+export interface JoinRoomInfo {
+    localMediaStream: MediaStream
+    roomName: string
+}

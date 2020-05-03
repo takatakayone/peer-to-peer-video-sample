@@ -18,6 +18,10 @@ export const Layout: React.FC = ({ children }) => {
 
 
 const GlobalStyle = createGlobalStyle`
+   html, body{
+   overflow: hidden;
+  }
+  
   body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -40,7 +44,7 @@ const Wrapper = styled.div`
 const Header = styled.div`
     display: flex;
     align-items: center;
-    height: 60px;
+    height: 5vh;
     color: #fff;
     background-color: #1E90FF;
     font-size: 20px;
@@ -49,5 +53,6 @@ const Header = styled.div`
 `;
 
 const Body = styled.div`
+    margin: 0 -8px;
     height: calc(100vh - 60px);
 `;
