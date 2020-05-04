@@ -17,24 +17,15 @@ export const Room: React.FC<PageProps> = (props) => {
         remoteVideoStreams: state.video.remoteVideoStreams,
     }));
 
-
-    const getUserVideoTrack = async () :Promise<MediaStreamTrack> => {
-        return navigator.mediaDevices
-            .getUserMedia({video: true, audio: true})
-            .then((stream) => stream.getVideoTracks()[0]);
-    };
-
     const dispatch = useDispatch();
 
     useEffect(() => {
-        getUserVideoTrack()
-            .then(videoTrack => {
-                const mediaStream = new MediaStream();
-                mediaStream.addTrack(videoTrack);
+        navigator.mediaDevices
+            .getUserMedia({video: true, audio: true})
+            .then((stream) => {
                 const roomName = props.match.params.roomId;
-                dispatch(RoomActions.joinRoom({localMediaStream: mediaStream, roomName: roomName}))
-            })
-            .catch(err => console.log(err));
+                dispatch(RoomActions.joinRoom({localMediaStream: stream, roomName: roomName}))
+            }).catch(err => console.log(err));
 
     }, []);
 

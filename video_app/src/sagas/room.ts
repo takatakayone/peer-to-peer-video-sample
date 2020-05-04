@@ -1,9 +1,9 @@
-import { take, call, put, takeLatest, select, fork } from 'redux-saga/effects';
+import { take, call, put, takeLatest, select } from 'redux-saga/effects';
 import { eventChannel, END } from 'redux-saga'
 
 import {RoomActions} from "actions/room";
 import {AuthenticatePeerApi} from "../apiClient/authenticatePeer";
-import Peer, {PeerCredential, RoomStream, SfuRoom} from "skyway-js";
+import Peer, {PeerCredential, RoomStream} from "skyway-js";
 
 import { State } from "../reducers";
 import {VideoActions} from "../actions/video";
