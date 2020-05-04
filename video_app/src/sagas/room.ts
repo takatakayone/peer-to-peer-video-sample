@@ -9,7 +9,7 @@ import { State } from "../reducers";
 import {VideoActions} from "../actions/video";
 
 const selectLocalVideoStream = (state: State) => state.video.localVideoStream;
-
+const skyWayApiKey=`${process.env.REACT_APP_SKYWAY_API_KEY}`;
 
 function* getRoomUrl(action: ReturnType<typeof RoomActions.getRoomUrl>) {
     // authenticate Peer
@@ -55,7 +55,7 @@ function* joinRoom(action:  ReturnType<typeof RoomActions.joinRoom>) {
     const localVideoStream = yield select(selectLocalVideoStream);
 
     const peer = new Peer(peerId,{
-        key: "api_key",
+        key: skyWayApiKey,
         debug: 2,
         credential: credential,
     });
@@ -75,7 +75,7 @@ function* joinRoom(action:  ReturnType<typeof RoomActions.joinRoom>) {
 function setPeerChannel(peerId: string, credential: PeerCredential) {
     return eventChannel((emit) => {
         const peer = new Peer(peerId,{
-            key: "api_key",
+            key: skyWayApiKey,
             debug: 2,
             credential: credential,
         });
