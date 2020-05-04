@@ -15,7 +15,7 @@ development:
   database: mysql_database
   pool: 5
   username: root
-  password: ENV['DATABASE_PASSWORD']
+  password: <%= ENV['RAILS_DATABASE_PASSWORD'] %>
   host: localhost
 
 # Warning: The database defined as "test" will be erased and
@@ -28,7 +28,7 @@ test:
   database: sample_mysql_test
   pool: 5
   username: root
-  password: ENV['DATABASE_PASSWORD']
+  password: <%= ENV['RAILS_DATABASE_PASSWORD'] %>
   host: localhost
 
 production:
@@ -38,5 +38,5 @@ production:
   database: sample_mysql_production
   pool: 5
   username: root
-  password: ENV['DATABASE_PASSWORD']
+  password: <%= ENV['RAILS_DATABASE_PASSWORD'] %>
   host: localhost
