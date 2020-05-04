@@ -4,7 +4,7 @@ import {VideoState} from "../types/video/video";
 
 
 const INITIAL_STATE: VideoState = {
-    localVideoStream: new MediaStream(),
+    localVideoStream: null,
     remoteVideoStreams: [],
 };
 

@@ -1,4 +1,4 @@
 export interface VideoState {
-    localVideoStream: MediaStream;
+    localVideoStream: MediaStream | null;
     remoteVideoStreams: MediaStream[];
 }

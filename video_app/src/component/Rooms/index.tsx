@@ -33,10 +33,14 @@ export const Room: React.FC<PageProps> = (props) => {
         <Wrapper>
             <RoomContainer>
                 <MainVideoContainer>
+                    {localVideoStream &&
                     <MainVideo stream={localVideoStream}></MainVideo>
+                    }
                 </MainVideoContainer>
                 <SubVideosContainer>
+                    {remoteVideoStreams &&
                     <SubVideos streams={remoteVideoStreams}/>
+                    }
                 </SubVideosContainer>
                 <Footer>ROOOM</Footer>
             </RoomContainer>

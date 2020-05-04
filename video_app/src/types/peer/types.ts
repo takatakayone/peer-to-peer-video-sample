@@ -1,22 +1,20 @@
+import Peer, {MeshRoom} from "skyway-js";
+
 export interface PeerAuthenticationInfo {
     peerId: string
     sessionToken: string
 }
 
-export interface PeerAuthenticationInfoState {
+export interface RoomState {
     peerId: string
     sessionToken: string
     roomUrl: string
-}
-
-export interface ResponsePeerAuthenticateInfo {
-    authToken: string
-    peerId: string
-    timeStamp: number
-    ttl: number
+    currentRoomName: string
+    currentRoom: MeshRoom | null
+    currentPeer: Peer | null
 }
 
 export interface JoinRoomInfo {
-    localMediaStream: MediaStream
+    localMediaStream: MediaStream | null
     roomName: string
 }

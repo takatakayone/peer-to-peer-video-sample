@@ -3,12 +3,17 @@ import { eventChannel, END } from 'redux-saga'
 
 import {RoomActions} from "actions/room";
 import {AuthenticatePeerApi} from "../apiClient/authenticatePeer";
-import Peer, {PeerCredential, RoomStream} from "skyway-js";
+import Peer, {MeshRoom, PeerCredential, RoomStream} from "skyway-js";
 
 import { State } from "../reducers";
 import {VideoActions} from "../actions/video";
 
+// SELECT CURRENT STORE STATE
 const selectLocalVideoStream = (state: State) => state.video.localVideoStream;
+const selectCurrentRoomName = (state: State) => state.room.currentRoomName;
+
+
+
 const skyWayApiKey=`${process.env.REACT_APP_SKYWAY_API_KEY}`;
 
 function* getRoomUrl(action: ReturnType<typeof RoomActions.getRoomUrl>) {
@@ -35,9 +40,14 @@ function* getRoomUrl(action: ReturnType<typeof RoomActions.getRoomUrl>) {
 }
 
 function* joinRoom(action:  ReturnType<typeof RoomActions.joinRoom>) {
-
     // setLocalMediaStream
-    yield put(VideoActions.setLocalVideoStream(action.payload.localMediaStream));
+    const localMediaStream = action.payload.localMediaStream;
+    if (localMediaStream) {
+      yield put(VideoActions.setLocalVideoStream(localMediaStream));
+    }
+
+    // setCurrentRoomName
+    yield put(RoomActions.setCurrentRoomName(action.payload.roomName));
 
     // authenticate Peer
     // TODO: peerIDは適切に生成/sessionTokenはちゃんとしたの入れる
@@ -52,23 +62,45 @@ function* joinRoom(action:  ReturnType<typeof RoomActions.joinRoom>) {
     }
     const credential: PeerCredential = response.data;
     const peerId = response.data.peerId;
-    const localVideoStream = yield select(selectLocalVideoStream);
-
     const peer = new Peer(peerId,{
         key: skyWayApiKey,
         debug: 2,
         credential: credential,
     });
 
-    const roomChannel = yield call(setRoomChannel, peer, localVideoStream, action.payload.roomName);
+    // createPeerChannel
+    const peerChannel = yield call(subscribePeerEvent, peer);
     try {
-        while (true) {
-            const stream = yield take(roomChannel);
-            yield put(VideoActions.setRemoteVideoStreams(stream));
+        while(true) {
+            const peerFromChannel = yield take(peerChannel);
+            yield put(RoomActions.setPeer(peerFromChannel));
         }
     } catch (error) {
-        // yield put(someActionHandler.failure(error));
+        console.log(error)
     }
+}
+
+function* observeRoomEvents(action:  ReturnType<typeof RoomActions.setPeer>) {
+    const peer = action.payload;
+    const roomName = yield select(selectCurrentRoomName);
+    const localVideoStream = yield select(selectLocalVideoStream);
+
+    const room: MeshRoom = peer.joinRoom(roomName, {mode: "mesh", stream: localVideoStream});
+
+    const roomStreamChannel = yield call(subscribeRoomStreamEvent, room);
+    const roomPeerJoin = yield call(subscribeRoomPeerJoinEvent, room);
+    try {
+        while (true) {
+            const remoteStream = yield take(roomStreamChannel);
+            yield put(VideoActions.setRemoteVideoStreams(remoteStream))
+
+            const peerId = yield take(roomPeerJoin);
+            console.log(peerId)
+        }
+    } catch (error) {
+        console.log(error)
+    }
+
 }
 
 
@@ -96,28 +128,10 @@ function setPeerChannel(peerId: string, credential: PeerCredential) {
     });
 }
 
-function setRoomChannel(peer: Peer, localVideoStream: MediaStream, roomName: string) {
+function subscribePeerEvent(peer: Peer) {
     return eventChannel((emit) => {
         peer.on("open", () => {
-            const room = peer.joinRoom(roomName, {
-                mode: "mesh",
-                stream: localVideoStream,
-            });
-
-            room.once('open', () => {
-                console.log("ONCE OPEN EVENT")
-            });
-            room.on('peerJoin', peerId => {
-                console.log("PEER JOIN EVENT")
-                console.log(peerId)
-            });
-
-            room.on("stream", async (stream: RoomStream) => {
-                console.log("STREAMMMMMMMMMMM")
-                console.log(stream)
-                emit(stream);
-            })
-
+            emit(peer)
         });
 
         // TODO: handle Error event
@@ -133,9 +147,40 @@ function setRoomChannel(peer: Peer, localVideoStream: MediaStream, roomName: str
     });
 }
 
+function subscribeRoomStreamEvent(room: MeshRoom) {
+    return eventChannel((emit) => {
+        room.on("stream", async (stream: RoomStream) => {
+            emit(stream);
+        });
 
+
+        // This subscriber function must return an unsubscribe function
+        return () => {
+            // TODO: must return an unsubscribe function
+            emit(END)
+        };
+    });
+}
+
+function subscribeRoomPeerJoinEvent(room: MeshRoom) {
+    return eventChannel((emit) => {
+        room.on("peerJoin", peerId => {
+            console.log(peerId)
+            console.log("PEER JOIN")
+            emit(peerId)
+        });
+
+
+        // This subscriber function must return an unsubscribe function
+        return () => {
+            // TODO: must return an unsubscribe function
+            emit(END)
+        };
+    });
+}
 
 export function* RoomSaga() {
     yield takeLatest(RoomActions.getRoomUrl, getRoomUrl);
     yield takeLatest(RoomActions.joinRoom, joinRoom);
+    yield takeLatest(RoomActions.setPeer, observeRoomEvents)
 }
