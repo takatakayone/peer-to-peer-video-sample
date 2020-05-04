@@ -7,13 +7,9 @@ export class ApiClient {
     axiosInstance: AxiosInstance;
     constructor(baseURL = '') {
         this.axiosInstance = axios.create({ baseURL });
-        // this.axiosInstance.defaults.headers.common['X-CSRF-Token'] = csrfToken();
         this.axiosInstance.defaults.headers.post['Content-Type'] = 'application/json;charset=utf-8';
         this.axiosInstance.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
         this.axiosInstance.defaults.withCredentials = true;
-
-        console.log("hey")
-        console.log(csrfToken());
 
         this.axiosInstance.interceptors.request.use(
             async (config: AxiosRequestConfig) => {
