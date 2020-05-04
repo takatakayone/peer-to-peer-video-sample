@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import {MainVideo} from "./MainVideo";
 import {State} from "../../reducers";
-import {VideoActions} from "../../actions/video";
 import {SubVideos} from "./SubVideos";
 import {RoomActions} from "../../actions/room";
 
@@ -27,7 +26,7 @@ export const Room: React.FC<PageProps> = (props) => {
                 dispatch(RoomActions.joinRoom({localMediaStream: stream, roomName: roomName}))
             }).catch(err => console.log(err));
 
-    }, []);
+    }, [dispatch, props.match.params.roomId]);
 
 
     return (

@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
 import { Link } from 'react-router-dom';
-import { Path } from '../routes';
 import { useDispatch, useSelector } from 'react-redux';
 import {RoomActions} from "../actions/room";
 import {State} from "../reducers";
@@ -85,15 +84,6 @@ const Header = styled.header`
 
 const Logo = styled.img`
   height: 40vmin;
-`;
-
-const OfficialLink = styled.a`
-  color: #09d3ac;
-`;
-
-const OtameshiLink = styled(Link)`
-  color: #fff;
-  margin-top: 30px;
 `;
 
 const CreateRoomButton = styled.button`

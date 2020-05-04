@@ -1,5 +1,4 @@
 import { ApiClient } from "./index";
-import { JSObject } from "../types/Common";
 
 const baseURL = 'http://localhost:3000';
 const apiClient = new ApiClient(baseURL);

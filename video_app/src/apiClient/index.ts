@@ -1,7 +1,5 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios';
 import { AxiosResponse } from 'types/responses/axios';
-import {csrfToken} from 'rails-ujs'
-
 
 export class ApiClient {
     axiosInstance: AxiosInstance;
