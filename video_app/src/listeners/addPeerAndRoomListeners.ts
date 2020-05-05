@@ -43,7 +43,6 @@ const addRoomListeners = (room: MeshRoom) => {
 
   room.on("stream", (stream) => {
       dispatch(VideoActions.reducerSetRemoteVideoStreams(stream));
-      dispatch(VideoActions.videoStreamAdded());
   });
 
   room.on("peerLeave", (peerId) => {

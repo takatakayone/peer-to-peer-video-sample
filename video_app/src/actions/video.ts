@@ -7,5 +7,5 @@ export const VideoActions = {
     reducerSetRemoteVideoStreams: actionCreator<MediaStream>('reducerSetRemoteVideoStreams'),
     reducerSetMainVideoStream: actionCreator<MediaStream>('reducerSetMainVideoStream'),
     reducerSetSubVideoStream: actionCreator<MediaStream>('reducerSetSubVideoStream'),
-    videoStreamAdded: actionCreator('videoStreamAdded'),
+    videoStreamAdded: actionCreator<MediaStream>('videoStreamAdded'),
 };
