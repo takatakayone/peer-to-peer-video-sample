@@ -13,19 +13,11 @@ const INITIAL_STATE: RoomState = {
 };
 
 export const roomReducer = reducerWithInitialState(INITIAL_STATE)
-    .case(RoomActions.setRoomUrl, (state, payload) => {
+    .case(RoomActions.reducerSetRoomUrl, (state, payload) => {
         state.roomUrl = payload;
         return state
     })
-    .case(RoomActions.setCurrentRoom, (state, room) => {
-        state.currentRoom = room;
-        return state
-    })
-    .case(RoomActions.setCurrentRoomName, (state, roomName) => {
-        state.currentRoomName = roomName;
-        return state
-    })
-    .case(RoomActions.setPeer, (state, peer) => {
+    .case(RoomActions.reducerSetPeer, (state, peer) => {
         state.currentPeer = peer;
         return state
     });

@@ -9,11 +9,11 @@ const INITIAL_STATE: VideoState = {
 };
 
 export const videoReducer = reducerWithInitialState(INITIAL_STATE)
-    .case(VideoActions.setLocalVideoStream, (state, stream) => {
+    .case(VideoActions.reducerSetLocalVideoStream, (state, stream) => {
         state.localVideoStream = stream;
         return state
     })
-    .case(VideoActions.setRemoteVideoStreams, (state, stream) => {
+    .case(VideoActions.reducerSetRemoteVideoStreams, (state, stream) => {
        state.remoteVideoStreams.push(stream);
        return state
     });

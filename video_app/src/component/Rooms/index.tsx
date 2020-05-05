@@ -23,7 +23,7 @@ export const Room: React.FC<PageProps> = (props) => {
             .getUserMedia({video: true, audio: true})
             .then((stream) => {
                 const roomName = props.match.params.roomId;
-                dispatch(RoomActions.joinRoom({localMediaStream: stream, roomName: roomName}))
+                dispatch(RoomActions.joinRoom({localMediaStream: stream, roomName: roomName, sessionToken: "gagagaa"}))
             }).catch(err => console.log(err));
 
     }, [dispatch, props.match.params.roomId]);

@@ -25,7 +25,7 @@ const App: React.FC = () => {
                     <CreateRoomButton
                         onClick={event => {
                             event.preventDefault();
-                            dispatch(RoomActions.getRoomUrl({peerId: `${Math.floor((Math.random() * 100000000) + 1)}`, sessionToken: "gaga"}))
+                            dispatch(RoomActions.createRoom({peerId: `${Math.floor((Math.random() * 100000000) + 1)}`, sessionToken: "gaga"}))
                             toggleModal(true)
                         }}
                     >
