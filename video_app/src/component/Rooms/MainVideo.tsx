@@ -9,7 +9,6 @@ export const MainVideo: React.FC<Props> = ({stream}) => {
     const videoRef = useRef<HTMLVideoElement>(null);
 
     useEffect(() => {
-        console.log("hey")
         const video = videoRef.current;
         if (video === null) {
             return;

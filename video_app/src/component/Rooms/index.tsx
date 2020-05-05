@@ -11,9 +11,9 @@ import {RouteComponentProps} from 'react-router-dom'
 type PageProps = {} & RouteComponentProps<{roomId: string}>;
 
 export const Room: React.FC<PageProps> = (props) => {
-    const { localVideoStream, remoteVideoStreams } = useSelector((state: State) => ({
-        localVideoStream: state.video.localVideoStream,
-        remoteVideoStreams: state.video.remoteVideoStreams,
+    const { mainVideoStream, subVideoStreams } = useSelector((state: State) => ({
+        mainVideoStream: state.video.mainVideoStream,
+        subVideoStreams: state.video.subVideoStreams,
     }));
 
     const dispatch = useDispatch();
@@ -33,13 +33,13 @@ export const Room: React.FC<PageProps> = (props) => {
         <Wrapper>
             <RoomContainer>
                 <MainVideoContainer>
-                    {localVideoStream &&
-                    <MainVideo stream={localVideoStream}></MainVideo>
+                    {mainVideoStream &&
+                    <MainVideo stream={mainVideoStream}></MainVideo>
                     }
                 </MainVideoContainer>
                 <SubVideosContainer>
-                    {remoteVideoStreams &&
-                    <SubVideos streams={remoteVideoStreams}/>
+                    {subVideoStreams &&
+                    <SubVideos streams={subVideoStreams}/>
                     }
                 </SubVideosContainer>
                 <Footer>ROOOM</Footer>

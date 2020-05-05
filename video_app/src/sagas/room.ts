@@ -1,4 +1,4 @@
-import { take, call, put, takeLatest, select } from 'redux-saga/effects';
+import { takeEvery, call, put, takeLatest, select } from 'redux-saga/effects';
 import { eventChannel, END } from 'redux-saga'
 
 import {RoomActions} from "actions/room";
@@ -7,10 +7,14 @@ import Peer, {MeshRoom, PeerCredential, RoomStream} from "skyway-js";
 
 import {VideoActions} from "../actions/video";
 import {addPeerForJoiningRoomListeners, addPeerForCreatingRoomListeners} from "../listeners/addPeerAndRoomListeners";
-
-
+import {State} from "../reducers";
 
 const skyWayApiKey=`${process.env.REACT_APP_SKYWAY_API_KEY}`;
+
+// Selectors
+const selectorRemoteVideoStreams = (state: State) => state.video.remoteVideoStreams;
+const selectorLocalVideoStream = (state: State) => state.video.localVideoStream;
+
 
 function* createRoom(action: ReturnType<typeof RoomActions.createRoom>) {
 
@@ -36,9 +40,6 @@ function* joinRoom(action:  ReturnType<typeof RoomActions.joinRoom>) {
 
     const localMediaStream = action.payload.localMediaStream;
     if (localMediaStream) {
-        // setLocalMediaStream
-      　yield put(VideoActions.reducerSetLocalVideoStream(localMediaStream));
-
       　// authenticate Peer
         const randomPeerId = `${Math.floor((Math.random() * 100000000) + 1)}`;
         const response = yield AuthenticatePeerApi.post({peerId: randomPeerId, sessionToken: action.payload.sessionToken });
@@ -51,7 +52,31 @@ function* joinRoom(action:  ReturnType<typeof RoomActions.joinRoom>) {
         const credential: PeerCredential = response.data;
         const peer = createPeer(randomPeerId, credential);
 
-        yield call(addPeerForJoiningRoomListeners, peer, action.payload.roomName, localMediaStream)
+        yield call(addPeerForJoiningRoomListeners, peer, action.payload.roomName, localMediaStream);
+
+        // setLocalMediaStream
+        yield put(VideoActions.reducerSetLocalVideoStream(localMediaStream));
+        yield put(VideoActions.videoStreamAdded())
+    }
+}
+
+
+function* displayVideoStreams(action: ReturnType<typeof VideoActions.videoStreamAdded>) {
+    const localVideoStream = yield select(selectorLocalVideoStream);
+    const remoteVideoStreams = yield select(selectorRemoteVideoStreams);
+
+
+    let firstRemoteVideoStream: MediaStream = remoteVideoStreams[0];
+    let otherRemoteVideoStream: MediaStream[] = remoteVideoStreams.slice(1, remoteVideoStreams.length);
+
+
+    // RemoteVideoStreamがない場合には、MainVideoにLocalVideo
+    if (remoteVideoStreams.length === 0) {
+        yield put(VideoActions.reducerSetMainVideoStream(localVideoStream));
+    } else {
+        yield put(VideoActions.reducerSetSubVideoStream(localVideoStream));
+        yield put(VideoActions.reducerSetMainVideoStream(firstRemoteVideoStream));
+        yield otherRemoteVideoStream.map((stream: MediaStream) => put(VideoActions.reducerSetSubVideoStream(stream)))
     }
 
 }
@@ -62,10 +87,8 @@ function createPeer(peerId: string, peerCredential: PeerCredential): Peer {
         debug: 2,
         credential: peerCredential,
     });
-
     return peer
 }
-
 
 
 
@@ -73,4 +96,5 @@ function createPeer(peerId: string, peerCredential: PeerCredential): Peer {
 export function* RoomSaga() {
     yield takeLatest(RoomActions.createRoom, createRoom);
     yield takeLatest(RoomActions.joinRoom, joinRoom);
+    yield takeEvery(VideoActions.videoStreamAdded, displayVideoStreams);
 }

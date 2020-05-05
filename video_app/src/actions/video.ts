@@ -4,5 +4,8 @@ const actionCreator = actionCreatorFactory('Video');
 
 export const VideoActions = {
     reducerSetLocalVideoStream: actionCreator<MediaStream>('reducerSetLocalVideoStream'),
-    reducerSetRemoteVideoStreams: actionCreator<MediaStream>('reducerSetRemoteVideoStreams')
+    reducerSetRemoteVideoStreams: actionCreator<MediaStream>('reducerSetRemoteVideoStreams'),
+    reducerSetMainVideoStream: actionCreator<MediaStream>('reducerSetMainVideoStream'),
+    reducerSetSubVideoStream: actionCreator<MediaStream>('reducerSetSubVideoStream'),
+    videoStreamAdded: actionCreator('videoStreamAdded'),
 };
