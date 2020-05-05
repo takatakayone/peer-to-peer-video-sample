@@ -63,7 +63,7 @@ function* joinRoom(action:  ReturnType<typeof RoomActions.joinRoom>) {
 
 
 function* watchRemoteVideoStream(action: ReturnType<typeof VideoActions.remoteVideoStreamAdded>) {
-    const remoteStream: MediaStream = action.payload;
+    const remoteStream: RoomStream = action.payload;
     yield put(VideoActions.reducerSetRemoteVideoStream(remoteStream));
     yield put(VideoActions.reducerSetSubVideoStream(remoteStream));
 }

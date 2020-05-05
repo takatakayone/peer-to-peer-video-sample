@@ -1,5 +1,5 @@
 import {Dispatch} from "redux";
-import Peer, {MeshRoom} from "skyway-js";
+import Peer, {MeshRoom, RoomStream} from "skyway-js";
 import {VideoActions} from "../actions/video";
 import {RoomActions} from "../actions/room";
 
@@ -41,7 +41,7 @@ const addRoomListeners = (room: MeshRoom) => {
 
   });
 
-  room.on("stream", (stream) => {
+  room.on("stream", (stream: RoomStream) => {
       dispatch(VideoActions.remoteVideoStreamAdded(stream));
   });
 
