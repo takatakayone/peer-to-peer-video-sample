@@ -62,8 +62,9 @@ function* joinRoom(action:  ReturnType<typeof RoomActions.joinRoom>) {
 }
 
 
-function* watchRemoteVideoStream(action: ReturnType<typeof VideoActions.reducerSetRemoteVideoStreams>) {
+function* watchRemoteVideoStream(action: ReturnType<typeof VideoActions.remoteVideoStreamAdded>) {
     const remoteStream: MediaStream = action.payload;
+    yield put(VideoActions.reducerSetRemoteVideoStream(remoteStream));
     yield put(VideoActions.reducerSetSubVideoStream(remoteStream));
 }
 
@@ -87,6 +88,6 @@ function createPeer(peerId: string, peerCredential: PeerCredential): Peer {
 export function* RoomSaga() {
     yield takeLatest(RoomActions.createRoom, createRoom);
     yield takeLatest(RoomActions.joinRoom, joinRoom);
-    yield takeEvery(VideoActions.reducerSetRemoteVideoStreams, watchRemoteVideoStream);
+    yield takeEvery(VideoActions.remoteVideoStreamAdded, watchRemoteVideoStream);
     yield takeEvery(VideoActions.remoteVideoStreamRemoved, watchRemoteVideoStreamRemoved)
 }

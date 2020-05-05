@@ -15,7 +15,7 @@ export const videoReducer = reducerWithInitialState(INITIAL_STATE)
         state.localVideoStream = stream;
         return state
     })
-    .case(VideoActions.reducerSetRemoteVideoStreams, (state, stream) => {
+    .case(VideoActions.reducerSetRemoteVideoStream, (state, stream) => {
        state.remoteVideoStreams.push(stream);
        return state
     })
@@ -26,4 +26,4 @@ export const videoReducer = reducerWithInitialState(INITIAL_STATE)
     .case(VideoActions.reducerSetSubVideoStream, (state, stream) => {
        state.subVideoStreams.push(stream);
        return state
-    })
+    });
