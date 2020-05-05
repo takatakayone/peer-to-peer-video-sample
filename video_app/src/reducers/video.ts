@@ -10,7 +10,6 @@ const INITIAL_STATE: VideoState = {
     subVideoStreams: [],
 };
 
-// FIXME: 荒れ放題。直す
 export const videoReducer = reducerWithInitialState(INITIAL_STATE)
     .case(VideoActions.reducerSetLocalVideoStream, (state, stream) => {
         state.localVideoStream = stream;
@@ -27,4 +26,4 @@ export const videoReducer = reducerWithInitialState(INITIAL_STATE)
     .case(VideoActions.reducerSetSubVideoStream, (state, stream) => {
        state.subVideoStreams.push(stream);
        return state
-    });
+    })

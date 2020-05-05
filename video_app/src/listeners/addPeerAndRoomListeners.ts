@@ -47,6 +47,6 @@ const addRoomListeners = (room: MeshRoom) => {
 
   room.on("peerLeave", (peerId) => {
       console.log("PEER LEAVE");
-      console.log(peerId)
+      dispatch(VideoActions.remoteVideoStreamRemoved(peerId));
   });
 };

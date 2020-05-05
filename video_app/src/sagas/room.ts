@@ -67,6 +67,11 @@ function* watchRemoteVideoStream(action: ReturnType<typeof VideoActions.reducerS
     yield put(VideoActions.reducerSetSubVideoStream(remoteStream));
 }
 
+function* watchRemoteVideoStreamRemoved(action: ReturnType<typeof VideoActions.remoteVideoStreamRemoved>) {
+    const removedPeerId: string = action.payload;
+
+}
+
 function createPeer(peerId: string, peerCredential: PeerCredential): Peer {
     const peer = new Peer(peerId,{
         key: skyWayApiKey,
@@ -83,4 +88,5 @@ export function* RoomSaga() {
     yield takeLatest(RoomActions.createRoom, createRoom);
     yield takeLatest(RoomActions.joinRoom, joinRoom);
     yield takeEvery(VideoActions.reducerSetRemoteVideoStreams, watchRemoteVideoStream);
+    yield takeEvery(VideoActions.remoteVideoStreamRemoved, watchRemoteVideoStreamRemoved)
 }
