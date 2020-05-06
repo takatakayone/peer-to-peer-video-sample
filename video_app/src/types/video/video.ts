@@ -1,7 +1,8 @@
 import {RoomStream} from "skyway-js";
 
 export interface VideoState {
-    localVideoStream: RoomStream | null;
+    localVideoStream: MediaStream | null;
+    preparationVideoStream: MediaStream | null;
     remoteVideoStreams: RoomStream[];
     mainVideoStream: MediaStream | null;
     subVideoStreams: MediaStream[];

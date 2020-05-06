@@ -4,11 +4,12 @@ import {RoomStream} from "skyway-js";
 const actionCreator = actionCreatorFactory('Video');
 
 export const VideoActions = {
-    reducerSetLocalVideoStream: actionCreator<RoomStream>('reducerSetLocalVideoStream'),
+    reducerSetLocalVideoStream: actionCreator<MediaStream>('reducerSetLocalVideoStream'),
+    reducerSetPreparationVideoStream: actionCreator<MediaStream>('reducerSetPreparationVideoStream'),
     reducerSetRemoteVideoStream: actionCreator<RoomStream>('reducerSetRemoteVideoStream'),
     reducerSetMainVideoStream: actionCreator<MediaStream>('reducerSetMainVideoStream'),
     reducerSetSubVideoStream: actionCreator<MediaStream>('reducerSetSubVideoStream'),
-    videoStreamAdded: actionCreator<MediaStream>('videoStreamAdded'),
+    localVideoStreamAdded: actionCreator<MediaStream>('localVideoStreamAdded'),
     remoteVideoStreamAdded: actionCreator<RoomStream>('remoteVideoStreamAdded'),
     remoteVideoStreamRemoved: actionCreator<string>('remoteVideoStreamRemoved'),
 };

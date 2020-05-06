@@ -10,11 +10,13 @@ import {RouteComponentProps} from 'react-router-dom'
 import {PreparationVideo} from "./PreparationVideo";
 import {RoomStream} from "skyway-js";
 import {string} from "prop-types";
+import {VideoActions} from "../../actions/video";
 
 type PageProps = {} & RouteComponentProps<{roomId: string}>;
 
 export const Room: React.FC<PageProps> = (props) => {
-    const { mainVideoStream, subVideoStreams, currentPeer } = useSelector((state: State) => ({
+    const { preparationVideoStream, mainVideoStream, subVideoStreams, currentPeer } = useSelector((state: State) => ({
+        preparationVideoStream: state.video.preparationVideoStream,
         mainVideoStream: state.video.mainVideoStream,
         subVideoStreams: state.video.subVideoStreams,
         currentPeer: state.room.currentPeer,
@@ -38,25 +40,22 @@ export const Room: React.FC<PageProps> = (props) => {
         navigator.mediaDevices
             .getUserMedia({video: true, audio: true})
             .then((stream: MediaStream) => {
-               const a: RoomStream = {
-                   stream
-               }
-
-
+                console.log("GETUSERMEDIA HOOOKS")
+                dispatch(VideoActions.localVideoStreamAdded(stream));
             }).catch(err => console.log(err));
-    }, [currentPeer]);
-
-
+    }, [MediaStream]);
 
     return (
         <Wrapper>
             {!isAlreadyJoined &&
             <PreparationRoomContainer>
                 <PreparationVideoContainer>
-                  <PreparationVideo></PreparationVideo>
+                  {preparationVideoStream &&
+                  <PreparationVideo stream={preparationVideoStream}></PreparationVideo>
+                  }
                 </PreparationVideoContainer>
                 <SettingsContainer>
-                  <UserName>Tenny the Wining Eleven LOSER</UserName>
+                  <UserName>Tenny the Winning Eleven SUPER LOSER</UserName>
                   <JoinButton>オンライン面接に今すぐ参加する</JoinButton>
                 </SettingsContainer>
             </PreparationRoomContainer>

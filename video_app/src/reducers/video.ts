@@ -5,6 +5,7 @@ import {VideoState} from "../types/video/video";
 
 const INITIAL_STATE: VideoState = {
     localVideoStream: null,
+    preparationVideoStream: null,
     remoteVideoStreams: [],
     mainVideoStream: null,
     subVideoStreams: [],
@@ -13,6 +14,10 @@ const INITIAL_STATE: VideoState = {
 export const videoReducer = reducerWithInitialState(INITIAL_STATE)
     .case(VideoActions.reducerSetLocalVideoStream, (state, stream) => {
         state.localVideoStream = stream;
+        return state
+    })
+    .case(VideoActions.reducerSetPreparationVideoStream, (state, stream) => {
+        state.preparationVideoStream = stream;
         return state
     })
     .case(VideoActions.reducerSetRemoteVideoStream, (state, stream) => {

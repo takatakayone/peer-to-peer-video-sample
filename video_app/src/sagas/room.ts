@@ -17,7 +17,6 @@ const selectorLocalVideoStream = (state: State) => state.video.localVideoStream;
 
 
 function* createRoom(action: ReturnType<typeof RoomActions.createRoom>) {
-
     // authenticate Peer
     // TODO: joinRoomとほぼ同じことするので共通化したいけど、generatorだとうまく返値が設定できずドギマギ。時間とってなおす
     const peerId = action.payload.peerId;
@@ -30,7 +29,6 @@ function* createRoom(action: ReturnType<typeof RoomActions.createRoom>) {
     }
     const credential: PeerCredential = response.data;
     const peer = createPeer(peerId, credential);
-
 
     // TODO: PEER ID = ROOM NAMEにしてる
     yield call(addPeerForCreatingRoomListeners, peer, peerId)
@@ -63,8 +61,13 @@ function* joinRoom(action:  ReturnType<typeof RoomActions.joinRoom>) {
     }
 }
 
+function* watchLocalVideoStreamAdded(action: ReturnType<typeof VideoActions.localVideoStreamAdded>) {
+    const localStream: MediaStream = action.payload;
+    yield put(VideoActions.reducerSetLocalVideoStream(localStream));
+    yield put(VideoActions.reducerSetPreparationVideoStream(localStream));
+}
 
-function* watchRemoteVideoStream(action: ReturnType<typeof VideoActions.remoteVideoStreamAdded>) {
+function* watchRemoteVideoStreamAdded(action: ReturnType<typeof VideoActions.remoteVideoStreamAdded>) {
     const remoteStream: RoomStream = action.payload;
     yield put(VideoActions.reducerSetRemoteVideoStream(remoteStream));
     yield put(VideoActions.reducerSetSubVideoStream(remoteStream));
@@ -89,8 +92,8 @@ function createPeer(peerId: string, peerCredential: PeerCredential): Peer {
 
 export function* RoomSaga() {
     yield takeLatest(RoomActions.createRoom, createRoom);
-    // yield takeLatest(RoomActions.joinRoom, joinRoom);
-    yield takeLatest(RoomActions.makePeerConnection, makePeerConnection)
-    yield takeEvery(VideoActions.remoteVideoStreamAdded, watchRemoteVideoStream);
-    yield takeEvery(VideoActions.remoteVideoStreamRemoved, watchRemoteVideoStreamRemoved)
+    yield takeLatest(RoomActions.makePeerConnection, makePeerConnection);
+    yield takeLatest(VideoActions.localVideoStreamAdded, watchLocalVideoStreamAdded);
+    yield takeEvery(VideoActions.remoteVideoStreamAdded, watchRemoteVideoStreamAdded);
+    yield takeEvery(VideoActions.remoteVideoStreamRemoved, watchRemoteVideoStreamRemoved);
 }
