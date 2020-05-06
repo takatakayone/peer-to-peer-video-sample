@@ -4,7 +4,6 @@ import {RoomActions} from "../actions/room";
 
 
 const INITIAL_STATE: RoomState = {
-    peerId: "abc",
     sessionToken: "session_token",
     roomUrl: "",
     currentRoomName: "",

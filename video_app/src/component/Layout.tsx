@@ -46,7 +46,7 @@ const Header = styled.div`
     align-items: center;
     height: 5vh;
     color: #fff;
-    background-color: #1E90FF;
+    background-color: #2196F3;
     font-size: 20px;
     font-weight: bold;
     padding: 0 20px;

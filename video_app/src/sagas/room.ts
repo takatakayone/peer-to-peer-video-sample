@@ -36,28 +36,30 @@ function* createRoom(action: ReturnType<typeof RoomActions.createRoom>) {
     yield call(addPeerForCreatingRoomListeners, peer, peerId)
 }
 
+function* makePeerConnection(action: ReturnType<typeof RoomActions.makePeerConnection>) {
+    // authenticate Peer
+    const randomPeerId = `${Math.floor((Math.random() * 100000000) + 1)}`;
+    const response = yield AuthenticatePeerApi.post({peerId: randomPeerId, sessionToken: action.payload.sessionToken });
+    if (!response.isSuccess) {
+        // TODO: Errorのhandlingをちゃんとする
+        alert(response.error);
+        return;
+    }
+    //TODO :ちゃんとresponseタイプ定義しよう
+    const credential: PeerCredential = response.data;
+    const peer: Peer = createPeer(randomPeerId, credential);
+    yield put(RoomActions.reducerSetPeer(peer));
+}
+
 function* joinRoom(action:  ReturnType<typeof RoomActions.joinRoom>) {
 
     const localMediaStream = action.payload.localMediaStream;
     if (localMediaStream) {
-
         // setLocalMediaStream
         yield put(VideoActions.reducerSetLocalVideoStream(localMediaStream));
         yield put(VideoActions.reducerSetMainVideoStream(localMediaStream));
 
-      　// authenticate Peer
-        const randomPeerId = `${Math.floor((Math.random() * 100000000) + 1)}`;
-        const response = yield AuthenticatePeerApi.post({peerId: randomPeerId, sessionToken: action.payload.sessionToken });
-        if (!response.isSuccess) {
-            // TODO: Errorのhandlingをちゃんとする
-            alert(response.error);
-            return;
-        }
-        //TODO :ちゃんとresponseタイプ定義しよう
-        const credential: PeerCredential = response.data;
-        const peer = createPeer(randomPeerId, credential);
 
-        yield call(addPeerForJoiningRoomListeners, peer, action.payload.roomName, localMediaStream);
     }
 }
 
@@ -87,7 +89,8 @@ function createPeer(peerId: string, peerCredential: PeerCredential): Peer {
 
 export function* RoomSaga() {
     yield takeLatest(RoomActions.createRoom, createRoom);
-    yield takeLatest(RoomActions.joinRoom, joinRoom);
+    // yield takeLatest(RoomActions.joinRoom, joinRoom);
+    yield takeLatest(RoomActions.makePeerConnection, makePeerConnection)
     yield takeEvery(VideoActions.remoteVideoStreamAdded, watchRemoteVideoStream);
     yield takeEvery(VideoActions.remoteVideoStreamRemoved, watchRemoteVideoStreamRemoved)
 }

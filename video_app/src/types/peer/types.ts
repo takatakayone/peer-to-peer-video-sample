@@ -1,4 +1,4 @@
-import Peer, {MeshRoom} from "skyway-js";
+import Peer, {MeshRoom, RoomStream, SfuRoom} from "skyway-js";
 
 export interface PeerAuthenticationInfo {
     peerId: string
@@ -6,7 +6,6 @@ export interface PeerAuthenticationInfo {
 }
 
 export interface RoomState {
-    peerId: string
     sessionToken: string
     roomUrl: string
     currentRoomName: string
@@ -15,7 +14,13 @@ export interface RoomState {
 }
 
 export interface JoinRoomInfo {
-    localMediaStream: MediaStream | null
+    localMediaStream: RoomStream | null
     roomName: string
     sessionToken: string
 }
+
+export interface MakePeerConnectionInfo {
+    sessionToken: string;
+}
+
+const a = new SfuRoom()
