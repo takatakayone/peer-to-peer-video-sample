@@ -4,11 +4,9 @@ import {RoomActions} from "../actions/room";
 
 
 const INITIAL_STATE: RoomState = {
-    sessionToken: "session_token",
     roomUrl: "",
-    currentRoomName: "",
-    currentRoom: null,
     currentPeer: null,
+    isInTheRoom: false,
 };
 
 export const roomReducer = reducerWithInitialState(INITIAL_STATE)

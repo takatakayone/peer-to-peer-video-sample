@@ -15,14 +15,14 @@ import {VideoActions} from "../../actions/video";
 type PageProps = {} & RouteComponentProps<{roomId: string}>;
 
 export const Room: React.FC<PageProps> = (props) => {
-    const { preparationVideoStream, mainVideoStream, subVideoStreams } = useSelector((state: State) => ({
+    const { preparationVideoStream, mainVideoStream, subVideoStreams, isInTheRoom } = useSelector((state: State) => ({
         preparationVideoStream: state.video.preparationVideoStream,
         mainVideoStream: state.video.mainVideoStream,
         subVideoStreams: state.video.subVideoStreams,
+        isInTheRoom: state.room.isInTheRoom,
     }));
 
     const sessionToken = "SESSION_TOKEN";
-    const [isAlreadyJoined, setIsJoined] = useState(false);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -34,13 +34,12 @@ export const Room: React.FC<PageProps> = (props) => {
     }, [MediaStream]);
 
     const joinRoomButtonClicked = () => {
-        setIsJoined(true);
         dispatch(RoomActions.joinRoomButtonClicked({sessionToken: sessionToken, roomName: props.match.params.roomId}))
     };
 
     return (
         <Wrapper>
-            {!isAlreadyJoined &&
+            {!isInTheRoom &&
             <PreparationRoomContainer>
                 <PreparationVideoContainer>
                   {preparationVideoStream &&
@@ -54,7 +53,7 @@ export const Room: React.FC<PageProps> = (props) => {
             </PreparationRoomContainer>
             }
 
-            {isAlreadyJoined &&
+            {isInTheRoom &&
             <RoomContainer>
               <MainVideoContainer>
                   {mainVideoStream &&
