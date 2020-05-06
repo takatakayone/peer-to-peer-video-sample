@@ -29,10 +29,15 @@ export const SubVideo: React.FC<Props> = ({stream}) => {
 };
 
 const Wrapper = styled.div`
-  margin: 0 0 8px 0; 
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  width:100%;
+  height:100%;
+  margin-top: 16px;
 `;
 
 const Video = styled.video`
-  width: 500px;
-  height: 32vh;
+  width: 80%;
+  border-radius: 20px;
 `;

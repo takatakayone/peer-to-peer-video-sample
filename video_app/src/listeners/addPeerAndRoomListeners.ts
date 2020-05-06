@@ -38,6 +38,8 @@ export const addPeerForJoiningRoomListeners = (peer: Peer, roomName: string, loc
 
 const addRoomListeners = (room: MeshRoom) => {
   room.once("open", () => {
+      console.log("ROOOOOM");
+      console.log(room);
       dispatch(RoomActions.joinedTheRoom("joined"));
   });
 

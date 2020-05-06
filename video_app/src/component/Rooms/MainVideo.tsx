@@ -29,10 +29,15 @@ export const MainVideo: React.FC<Props> = ({stream}) => {
 };
 
 const Wrapper = styled.div`
-  
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  width:100%;
+  height:100%;
+  background:#282c34;
 `;
 
 const Video = styled.video`
-  width: auto;
-  height: auto;
+  width: 100%;
+  background:#282c34;
 `;

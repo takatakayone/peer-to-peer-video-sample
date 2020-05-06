@@ -65,7 +65,9 @@ function* watchJoinRoomButtonClicked(action: ReturnType<typeof RoomActions.joinR
 }
 
 function* watchJoinedTheRoom(action: ReturnType<typeof RoomActions.joinedTheRoom>) {
+    const localVideoStream = yield select(selectorLocalVideoStream);
     yield put(RoomActions.reducerIsInTheRoom(true));
+    yield put(VideoActions.reducerSetMainVideoStream(localVideoStream));
 }
 
 function* watchLocalVideoStreamAdded(action: ReturnType<typeof VideoActions.localVideoStreamAdded>) {

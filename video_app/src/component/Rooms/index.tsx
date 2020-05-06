@@ -123,26 +123,23 @@ const JoinButton = styled.button`
 `;
 
 
-
-
-
-
 const RoomContainer = styled.div`
   display: grid;
-  grid-template-rows: 60vh 25vh;
-  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 85vh;
+  grid-template-columns: 5fr 2fr;
   grid-template-areas:
         "mainVideoContainerArea subVideosContainerArea"
-        ". subVideosContainerArea";
+        "mainVideoContainerArea subVideosContainerArea";
 `;
 
 const MainVideoContainer = styled.div`
   grid-area: mainVideoContainerArea;
+  background-color: #282c34;
 `;
 
 const SubVideosContainer = styled.div`
   grid-area: subVideosContainerArea;
-  background: #8f8;
+  
 `;
 
 const Footer = styled.div`
