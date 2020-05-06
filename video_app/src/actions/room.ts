@@ -5,8 +5,10 @@ import Peer, {MeshRoom} from "skyway-js";
 const actionCreator = actionCreatorFactory('Room');
 
 export const RoomActions = {
-    createRoom: actionCreator<PeerAuthenticationInfo>('createRoom'),
     reducerSetRoomUrl: actionCreator<string>('reducerSetRoomUrl'),
+    reducerSetPeer: actionCreator<Peer>('setPeer'),
+    reducerIsInTheRoom: actionCreator<boolean>('reducerIsInTheRoom'),
+    createRoom: actionCreator<PeerAuthenticationInfo>('createRoom'),
     joinRoomButtonClicked: actionCreator<JoinRoomInfo>('joinRoomButtonClicked'),
-    reducerSetPeer: actionCreator<Peer>('setPeer')
+    joinedTheRoom: actionCreator<string>('joinedTheRoom')
 };

@@ -38,7 +38,7 @@ export const addPeerForJoiningRoomListeners = (peer: Peer, roomName: string, loc
 
 const addRoomListeners = (room: MeshRoom) => {
   room.once("open", () => {
-      console.log("You are in the room!");
+      dispatch(RoomActions.joinedTheRoom("joined"));
   });
 
   room.on("stream", (stream: RoomStream) => {
@@ -46,7 +46,6 @@ const addRoomListeners = (room: MeshRoom) => {
   });
 
   room.on("peerLeave", (peerId) => {
-      console.log("PEER LEAVE");
       dispatch(VideoActions.remoteVideoStreamRemoved(peerId));
   });
 };

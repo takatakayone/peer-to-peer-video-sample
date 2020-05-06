@@ -8,8 +8,6 @@ import {RoomActions} from "../../actions/room";
 
 import {RouteComponentProps} from 'react-router-dom'
 import {PreparationVideo} from "./PreparationVideo";
-import {RoomStream} from "skyway-js";
-import {string} from "prop-types";
 import {VideoActions} from "../../actions/video";
 
 type PageProps = {} & RouteComponentProps<{roomId: string}>;
