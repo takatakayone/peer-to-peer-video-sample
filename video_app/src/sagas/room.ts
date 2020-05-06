@@ -14,6 +14,7 @@ const skyWayApiKey=`${process.env.REACT_APP_SKYWAY_API_KEY}`;
 // Selectors
 const selectorRemoteVideoStreams = (state: State) => state.video.remoteVideoStreams;
 const selectorLocalVideoStream = (state: State) => state.video.localVideoStream;
+const selectorCurrentPeer = (state: State) => state.room.currentPeer;
 
 
 function* createRoom(action: ReturnType<typeof RoomActions.createRoom>) {
@@ -34,10 +35,10 @@ function* createRoom(action: ReturnType<typeof RoomActions.createRoom>) {
     yield call(addPeerForCreatingRoomListeners, peer, peerId)
 }
 
-function* makePeerConnection(action: ReturnType<typeof RoomActions.makePeerConnection>) {
+function* makePeerConnection(sessionToken: string) {
     // authenticate Peer
     const randomPeerId = `${Math.floor((Math.random() * 100000000) + 1)}`;
-    const response = yield AuthenticatePeerApi.post({peerId: randomPeerId, sessionToken: action.payload.sessionToken });
+    const response = yield AuthenticatePeerApi.post({peerId: randomPeerId, sessionToken: sessionToken });
     if (!response.isSuccess) {
         // TODO: Errorのhandlingをちゃんとする
         alert(response.error);
@@ -49,15 +50,16 @@ function* makePeerConnection(action: ReturnType<typeof RoomActions.makePeerConne
     yield put(RoomActions.reducerSetPeer(peer));
 }
 
-function* joinRoom(action:  ReturnType<typeof RoomActions.joinRoom>) {
+function* watchJoinRoomButtonClicked(action: ReturnType<typeof RoomActions.joinRoomButtonClicked>) {
+    const roomName = action.payload.roomName;
+    const sessionToken = action.payload.sessionToken;
 
-    const localMediaStream = action.payload.localMediaStream;
-    if (localMediaStream) {
-        // setLocalMediaStream
-        yield put(VideoActions.reducerSetLocalVideoStream(localMediaStream));
-        yield put(VideoActions.reducerSetMainVideoStream(localMediaStream));
+    yield call(makePeerConnection, sessionToken);
+    const peer = yield select(selectorCurrentPeer);
+    const localVideoStream = yield select(selectorLocalVideoStream);
 
-
+    if (peer && localVideoStream) {
+        yield call(addPeerForJoiningRoomListeners, peer, roomName, localVideoStream);
     }
 }
 
@@ -92,7 +94,7 @@ function createPeer(peerId: string, peerCredential: PeerCredential): Peer {
 
 export function* RoomSaga() {
     yield takeLatest(RoomActions.createRoom, createRoom);
-    yield takeLatest(RoomActions.makePeerConnection, makePeerConnection);
+    yield takeLatest(RoomActions.joinRoomButtonClicked, watchJoinRoomButtonClicked);
     yield takeLatest(VideoActions.localVideoStreamAdded, watchLocalVideoStreamAdded);
     yield takeEvery(VideoActions.remoteVideoStreamAdded, watchRemoteVideoStreamAdded);
     yield takeEvery(VideoActions.remoteVideoStreamRemoved, watchRemoteVideoStreamRemoved);

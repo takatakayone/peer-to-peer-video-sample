@@ -38,7 +38,7 @@ export const addPeerForJoiningRoomListeners = (peer: Peer, roomName: string, loc
 
 const addRoomListeners = (room: MeshRoom) => {
   room.on("open", () => {
-
+      console.log("You are in the room!")
   });
 
   room.on("stream", (stream: RoomStream) => {

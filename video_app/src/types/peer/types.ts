@@ -14,7 +14,6 @@ export interface RoomState {
 }
 
 export interface JoinRoomInfo {
-    localMediaStream: RoomStream | null
     roomName: string
     sessionToken: string
 }

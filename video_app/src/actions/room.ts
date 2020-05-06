@@ -7,7 +7,6 @@ const actionCreator = actionCreatorFactory('Room');
 export const RoomActions = {
     createRoom: actionCreator<PeerAuthenticationInfo>('createRoom'),
     reducerSetRoomUrl: actionCreator<string>('reducerSetRoomUrl'),
-    joinRoom: actionCreator<JoinRoomInfo>('joinRoom'),
-    makePeerConnection: actionCreator<MakePeerConnectionInfo>('makePeerConnection'),
+    joinRoomButtonClicked: actionCreator<JoinRoomInfo>('joinRoomButtonClicked'),
     reducerSetPeer: actionCreator<Peer>('setPeer')
 };

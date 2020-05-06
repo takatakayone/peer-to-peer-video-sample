@@ -15,35 +15,28 @@ import {VideoActions} from "../../actions/video";
 type PageProps = {} & RouteComponentProps<{roomId: string}>;
 
 export const Room: React.FC<PageProps> = (props) => {
-    const { preparationVideoStream, mainVideoStream, subVideoStreams, currentPeer } = useSelector((state: State) => ({
+    const { preparationVideoStream, mainVideoStream, subVideoStreams } = useSelector((state: State) => ({
         preparationVideoStream: state.video.preparationVideoStream,
         mainVideoStream: state.video.mainVideoStream,
         subVideoStreams: state.video.subVideoStreams,
-        currentPeer: state.room.currentPeer,
     }));
 
     const sessionToken = "SESSION_TOKEN";
     const [isAlreadyJoined, setIsJoined] = useState(false);
     const dispatch = useDispatch();
 
-    // useEffect(() => {
-    //     const roomName = props.match.params.roomId;
-    //     dispatch(RoomActions.joinRoom({localMediaStream: stream, roomName: roomName, sessionToken: "gagagaa"}))
-    //
-    // }, [dispatch, props.match.params.roomId]);
-
-    useEffect(() => {
-        dispatch(RoomActions.makePeerConnection({sessionToken: sessionToken}));
-    },[sessionToken]);
-
     useEffect(() => {
         navigator.mediaDevices
             .getUserMedia({video: true, audio: true})
             .then((stream: MediaStream) => {
-                console.log("GETUSERMEDIA HOOOKS")
                 dispatch(VideoActions.localVideoStreamAdded(stream));
             }).catch(err => console.log(err));
     }, [MediaStream]);
+
+    const joinRoomButtonClicked = () => {
+        setIsJoined(true);
+        dispatch(RoomActions.joinRoomButtonClicked({sessionToken: sessionToken, roomName: props.match.params.roomId}))
+    };
 
     return (
         <Wrapper>
@@ -56,7 +49,7 @@ export const Room: React.FC<PageProps> = (props) => {
                 </PreparationVideoContainer>
                 <SettingsContainer>
                   <UserName>Tenny the Winning Eleven SUPER LOSER</UserName>
-                  <JoinButton>オンライン面接に今すぐ参加する</JoinButton>
+                  <JoinButton onClick={joinRoomButtonClicked}>オンライン面接に今すぐ参加する</JoinButton>
                 </SettingsContainer>
             </PreparationRoomContainer>
             }
