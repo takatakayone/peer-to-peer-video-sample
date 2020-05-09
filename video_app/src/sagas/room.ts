@@ -8,6 +8,7 @@ import Peer, {MeshRoom, PeerCredential, RoomStream} from "skyway-js";
 import {VideoActions} from "../actions/video";
 import {addPeerForJoiningRoomListeners, addPeerForCreatingRoomListeners} from "../listeners/addPeerAndRoomListeners";
 import {State} from "../reducers";
+import {VideoMedia} from "../models/videoMedia";
 
 const skyWayApiKey=`${process.env.REACT_APP_SKYWAY_API_KEY}`;
 
@@ -65,8 +66,9 @@ function* watchJoinRoomButtonClicked(action: ReturnType<typeof RoomActions.joinR
 
 function* watchLocalVideoStreamAdded(action: ReturnType<typeof VideoActions.localVideoStreamAdded>) {
     const localStream: MediaStream = action.payload;
-    yield put(VideoActions.reducerSetLocalVideoStream(localStream));
-    yield put(VideoActions.reducerSetPreparationVideoStream(localStream));
+    const localVideoStream = new VideoMedia(localStream, null);
+    yield put(VideoActions.reducerSetLocalVideoStream(localVideoStream));
+    yield put(VideoActions.reducerSetPreparationVideoStream(localVideoStream));
 }
 
 function* watchJoinedTheRoom(action: ReturnType<typeof RoomActions.joinedTheRoom>) {

@@ -1,8 +1,9 @@
 import React, {useEffect, useRef} from 'react';
 import styled from 'styled-components';
+import {VideoMedia} from "../../models/videoMedia";
 
 interface Props {
-    stream: MediaStream;
+    stream: VideoMedia;
 }
 
 export const PreparationVideo: React.FC<Props> = ({stream}) => {
@@ -14,7 +15,7 @@ export const PreparationVideo: React.FC<Props> = ({stream}) => {
             return;
         }
         video.muted = true;
-        video.srcObject = stream;
+        video.srcObject = stream.mediaStream;
         video.play().catch(err => console.log(err));
     }, [stream]);
 

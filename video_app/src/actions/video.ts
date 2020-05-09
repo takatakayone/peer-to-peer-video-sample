@@ -1,11 +1,12 @@
 import actionCreatorFactory from 'typescript-fsa';
 import {RoomStream} from "skyway-js";
+import {VideoMedia} from "../models/videoMedia";
 
 const actionCreator = actionCreatorFactory('Video');
 
 export const VideoActions = {
-    reducerSetLocalVideoStream: actionCreator<MediaStream>('reducerSetLocalVideoStream'),
-    reducerSetPreparationVideoStream: actionCreator<MediaStream>('reducerSetPreparationVideoStream'),
+    reducerSetLocalVideoStream: actionCreator<VideoMedia>('reducerSetLocalVideoStream'),
+    reducerSetPreparationVideoStream: actionCreator<VideoMedia>('reducerSetPreparationVideoStream'),
     reducerSetRemoteVideoStream: actionCreator<RoomStream>('reducerSetRemoteVideoStream'),
     reducerSetRemoteVideoStreams: actionCreator<RoomStream[]>('reducerSetRemoteVideoStreams'),
     reducerSetMainVideoStream: actionCreator<MediaStream>('reducerSetMainVideoStream'),
