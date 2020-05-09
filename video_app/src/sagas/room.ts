@@ -8,7 +8,6 @@ import Peer, {MeshRoom, PeerCredential, RoomStream} from "skyway-js";
 import {VideoActions} from "../actions/video";
 import {addPeerForJoiningRoomListeners, addPeerForCreatingRoomListeners} from "../listeners/addPeerAndRoomListeners";
 import {State} from "../reducers";
-import {Room} from "../component/Rooms";
 
 const skyWayApiKey=`${process.env.REACT_APP_SKYWAY_API_KEY}`;
 

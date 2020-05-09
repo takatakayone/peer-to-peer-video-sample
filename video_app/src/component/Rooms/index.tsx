@@ -29,11 +29,9 @@ export const Room: React.FC<PageProps> = (props) => {
             .then((stream: MediaStream) => {
                 dispatch(VideoActions.localVideoStreamAdded(stream));
             }).catch(err => console.log(err));
-    }, [MediaStream]);
+    }, [dispatch]);
 
-    const joinRoomButtonClicked = () => {
-        dispatch(RoomActions.joinRoomButtonClicked({sessionToken: sessionToken, roomName: props.match.params.roomId}))
-    };
+    const joinRoomButtonClicked = useCallback(() => {dispatch(RoomActions.joinRoomButtonClicked({sessionToken: sessionToken, roomName: props.match.params.roomId}))} ,[dispatch, sessionToken, props.match.params.roomId]);
 
     return (
         <Wrapper>
