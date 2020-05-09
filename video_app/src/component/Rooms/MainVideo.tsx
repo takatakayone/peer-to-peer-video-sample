@@ -13,7 +13,6 @@ export const MainVideo: React.FC<Props> = ({stream}) => {
         if (video === null) {
             return;
         }
-        video.muted = true;
         video.srcObject = stream;
         video.play().catch(err => console.log(err));
     }, [stream]);
