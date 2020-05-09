@@ -63,27 +63,56 @@ function* watchJoinRoomButtonClicked(action: ReturnType<typeof RoomActions.joinR
     }
 }
 
-function* watchJoinedTheRoom(action: ReturnType<typeof RoomActions.joinedTheRoom>) {
-    const localVideoStream = yield select(selectorLocalVideoStream);
-    yield put(RoomActions.reducerIsInTheRoom(true));
-    yield put(VideoActions.reducerSetMainVideoStream(localVideoStream));
-}
-
 function* watchLocalVideoStreamAdded(action: ReturnType<typeof VideoActions.localVideoStreamAdded>) {
     const localStream: MediaStream = action.payload;
     yield put(VideoActions.reducerSetLocalVideoStream(localStream));
     yield put(VideoActions.reducerSetPreparationVideoStream(localStream));
 }
 
+function* watchJoinedTheRoom(action: ReturnType<typeof RoomActions.joinedTheRoom>) {
+    yield put(RoomActions.reducerIsInTheRoom(true));
+
+    yield call(setMainAndSubVideoStream);
+}
+
 function* watchRemoteVideoStreamAdded(action: ReturnType<typeof VideoActions.remoteVideoStreamAdded>) {
     const remoteStream: RoomStream = action.payload;
     yield put(VideoActions.reducerSetRemoteVideoStream(remoteStream));
-    yield put(VideoActions.reducerSetSubVideoStream(remoteStream));
+
+    yield call(setMainAndSubVideoStream);
 }
 
 function* watchRemoteVideoStreamRemoved(action: ReturnType<typeof VideoActions.remoteVideoStreamRemoved>) {
     const removedPeerId: string = action.payload;
+    const remoteVideoStreams: RoomStream[] = yield select(selectorRemoteVideoStreams);
+    const remainedVideoStreams: RoomStream[] = remoteVideoStreams.filter(remoteStream => remoteStream.peerId !== removedPeerId);
+    yield put(VideoActions.reducerSetRemoteVideoStreams(remainedVideoStreams));
 
+    yield call(setMainAndSubVideoStream);
+}
+
+function* setMainAndSubVideoStream() {
+    const localVideoStream = yield select(selectorLocalVideoStream);
+    const remoteVideoStreams = yield select(selectorRemoteVideoStreams);
+
+    // remoteVideoStreamsが存在しない場合はmain画面をlocalVideoStreamにする
+    if (remoteVideoStreams.length === 0) {
+        yield put(VideoActions.reducerSetMainVideoStream(localVideoStream));
+        yield put(VideoActions.reducerSetSubVideoStreams([]));
+    } else {
+        // remoteVideoStreamで最初のやつをmain画面にset
+        // localVideoStreamはsubViewの最初にset
+        const mainRemoteVideoStream = remoteVideoStreams[0];
+        yield put(VideoActions.reducerSetMainVideoStream(mainRemoteVideoStream));
+        const subVideoStreams: MediaStream[] = [];
+        subVideoStreams.push(localVideoStream);
+        remoteVideoStreams.forEach((remoteVideoStream: MediaStream, index: number) => {
+            if (index !== 0) {
+                subVideoStreams.push(remoteVideoStream)
+            }
+        });
+        yield put(VideoActions.reducerSetSubVideoStreams(subVideoStreams));
+    }
 }
 
 function createPeer(peerId: string, peerCredential: PeerCredential): Peer {
