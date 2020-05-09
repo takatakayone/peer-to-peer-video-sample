@@ -1,9 +1,10 @@
 import React, {useEffect, useRef} from "react";
 import styled from "styled-components";
 import {SubVideo} from "./SubVideo";
+import {VideoMedia} from "../../models/videoMedia";
 
 interface Props {
-    streams: MediaStream[];
+    streams: VideoMedia[];
 }
 
 export const SubVideos: React.FC<Props> = ({streams}) => {
@@ -13,10 +14,10 @@ export const SubVideos: React.FC<Props> = ({streams}) => {
 
     return (
         <Wrapper>
-            {streams.map(stream => {
+            {streams.map((stream, index) => {
                 return(
                     <SubVideo
-                        key={stream.id}
+                        key={index}
                         stream={stream}
                     />
                 )

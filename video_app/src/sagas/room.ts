@@ -57,10 +57,10 @@ function* watchJoinRoomButtonClicked(action: ReturnType<typeof RoomActions.joinR
 
     yield call(makePeerConnection, sessionToken);
     const peer = yield select(selectorCurrentPeer);
-    const localVideoStream = yield select(selectorLocalVideoStream);
+    const localVideoMedia: VideoMedia = yield select(selectorLocalVideoStream);
 
-    if (peer && localVideoStream) {
-        yield call(addPeerForJoiningRoomListeners, peer, roomName, localVideoStream);
+    if (peer && localVideoMedia) {
+        yield call(addPeerForJoiningRoomListeners, peer, roomName, localVideoMedia.mediaStream);
     }
 }
 
@@ -79,23 +79,24 @@ function* watchJoinedTheRoom(action: ReturnType<typeof RoomActions.joinedTheRoom
 
 function* watchRemoteVideoStreamAdded(action: ReturnType<typeof VideoActions.remoteVideoStreamAdded>) {
     const remoteStream: RoomStream = action.payload;
-    yield put(VideoActions.reducerSetRemoteVideoStream(remoteStream));
+    const remoteVideoMedia: VideoMedia = new VideoMedia(remoteStream, remoteStream.peerId);
+    yield put(VideoActions.reducerSetRemoteVideoStream(remoteVideoMedia));
 
     yield call(setMainAndSubVideoStream);
 }
 
 function* watchRemoteVideoStreamRemoved(action: ReturnType<typeof VideoActions.remoteVideoStreamRemoved>) {
     const removedPeerId: string = action.payload;
-    const remoteVideoStreams: RoomStream[] = yield select(selectorRemoteVideoStreams);
-    const remainedVideoStreams: RoomStream[] = remoteVideoStreams.filter(remoteStream => remoteStream.peerId !== removedPeerId);
+    const remoteVideoStreams: VideoMedia[] = yield select(selectorRemoteVideoStreams);
+    const remainedVideoStreams: VideoMedia[] = remoteVideoStreams.filter(remoteStream => remoteStream.peerId !== removedPeerId);
     yield put(VideoActions.reducerSetRemoteVideoStreams(remainedVideoStreams));
 
     yield call(setMainAndSubVideoStream);
 }
 
 function* setMainAndSubVideoStream() {
-    const localVideoStream = yield select(selectorLocalVideoStream);
-    const remoteVideoStreams = yield select(selectorRemoteVideoStreams);
+    const localVideoStream: VideoMedia = yield select(selectorLocalVideoStream);
+    const remoteVideoStreams: VideoMedia[] = yield select(selectorRemoteVideoStreams);
 
     // remoteVideoStreamsが存在しない場合はmain画面をlocalVideoStreamにする
     if (remoteVideoStreams.length === 0) {
@@ -106,9 +107,9 @@ function* setMainAndSubVideoStream() {
         // localVideoStreamはsubViewの最初にset
         const mainRemoteVideoStream = remoteVideoStreams[0];
         yield put(VideoActions.reducerSetMainVideoStream(mainRemoteVideoStream));
-        const subVideoStreams: MediaStream[] = [];
+        const subVideoStreams: VideoMedia[] = [];
         subVideoStreams.push(localVideoStream);
-        remoteVideoStreams.forEach((remoteVideoStream: MediaStream, index: number) => {
+        remoteVideoStreams.forEach((remoteVideoStream: VideoMedia, index: number) => {
             if (index !== 0) {
                 subVideoStreams.push(remoteVideoStream)
             }
