@@ -8,35 +8,21 @@
 #
 # And be sure to use new-style password hashing:
 #   http://dev.mysql.com/doc/refman/5.0/en/old-client.html
-development:
+default: &default
   adapter: mysql2
   encoding: utf8
-  reconnect: false
-  database: mysql_database
-  pool: 5
-  username: root
-  password: <%= ENV['RAILS_DATABASE_PASSWORD'] %>
-  host: localhost
+  pool:     <%= ENV.fetch('RAILS_MAX_THREADS') { 5 } %>
+  username: <%= ENV.fetch('MYSQL_USERNAME', 'sample') %>
+  password: <%= ENV.fetch('MYSQL_PASSWORD', 'root') %>
+  host:     <%= ENV.fetch('MYSQL_HOST', 'db') %>
+  port:     <%= ENV.fetch('MYSQL_PORT', '3306') %>
+  database: <%= ENV.fetch('MYSQL_DATABASE', 'sample') %>
 
-# Warning: The database defined as "test" will be erased and
-# re-generated from your development database when you run "rake".
-# Do not set this db to the same as development or production.
+development:
+  <<: *default
+
 test:
-  adapter: mysql2
-  encoding: utf8
-  reconnect: false
-  database: sample_mysql_test
-  pool: 5
-  username: root
-  password: <%= ENV['RAILS_DATABASE_PASSWORD'] %>
-  host: localhost
+  <<: *default
 
 production:
-  adapter: mysql2
-  encoding: utf8
-  reconnect: false
-  database: sample_mysql_production
-  pool: 5
-  username: root
-  password: <%= ENV['RAILS_DATABASE_PASSWORD'] %>
-  host: localhost
+  <<: *default

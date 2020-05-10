@@ -1,0 +1,7 @@
+FROM node:13.1
+
+ENV APP_ROOT /usr/src/app
+
+WORKDIR $APP_ROOT
+
+EXPOSE 3333

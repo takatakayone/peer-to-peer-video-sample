@@ -1,6 +1,6 @@
 import { ApiClient } from "./index";
 
-const baseURL = 'http://localhost:3000';
+const baseURL = '/apis';
 const apiClient = new ApiClient(baseURL);
 
 const AUTHENTICATE_PATH = '/authenticate';
