@@ -1,7 +1,6 @@
 import React, {useCallback} from "react";
 import styled from "styled-components";
 import {useDispatch} from "react-redux";
-import {VideoActions} from "../../../actions/video";
 
 export const ShareScreenButton: React.FC = () => {
     const dispatch = useDispatch();

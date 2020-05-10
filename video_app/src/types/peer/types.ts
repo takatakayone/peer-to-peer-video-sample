@@ -1,4 +1,4 @@
-import Peer, {MeshRoom} from "skyway-js";
+import Peer, {MeshRoom, SfuRoom} from "skyway-js";
 
 export interface PeerAuthenticationInfo {
     peerId: string
@@ -9,6 +9,7 @@ export interface RoomState {
     roomUrl: string;
     currentPeer: Peer | null;
     isInTheRoom: boolean;
+    currentRoom: MeshRoom | SfuRoom | null;
 }
 
 export interface JoinRoomInfo {

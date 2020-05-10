@@ -16,6 +16,7 @@ const skyWayApiKey=`${process.env.REACT_APP_SKYWAY_API_KEY}`;
 const selectorRemoteVideoStreams = (state: State) => state.video.remoteVideoStreams;
 const selectorLocalVideoStream = (state: State) => state.video.localVideoStream;
 const selectorCurrentPeer = (state: State) => state.room.currentPeer;
+const selectorCurrentRoom = (state: State) => state.room.currentRoom;
 
 
 function* createRoom(action: ReturnType<typeof RoomActions.createRoom>) {
@@ -72,8 +73,9 @@ function* watchLocalVideoStreamAdded(action: ReturnType<typeof VideoActions.loca
 }
 
 function* watchJoinedTheRoom(action: ReturnType<typeof RoomActions.joinedTheRoom>) {
+    const room = action.payload;
+    yield put(RoomActions.reducerSetRoom(room));
     yield put(RoomActions.reducerIsInTheRoom(true));
-
     yield call(setMainAndSubVideoStream);
 }
 
@@ -81,7 +83,6 @@ function* watchRemoteVideoStreamAdded(action: ReturnType<typeof VideoActions.rem
     const remoteStream: RoomStream = action.payload;
     const remoteVideoMedia: VideoMedia = new VideoMedia(remoteStream, remoteStream.peerId);
     yield put(VideoActions.reducerSetRemoteVideoStream(remoteVideoMedia));
-
     yield call(setMainAndSubVideoStream);
 }
 
@@ -119,7 +120,7 @@ function* setMainAndSubVideoStream() {
 }
 
 function createPeer(peerId: string, peerCredential: PeerCredential): Peer {
-    const peer = new Peer(peerId,{
+    const peer: Peer = new Peer(peerId,{
         key: skyWayApiKey,
         debug: 2,
         credential: peerCredential,

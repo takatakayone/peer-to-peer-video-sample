@@ -7,6 +7,7 @@ const INITIAL_STATE: RoomState = {
     roomUrl: "",
     currentPeer: null,
     isInTheRoom: false,
+    currentRoom: null
 };
 
 export const roomReducer = reducerWithInitialState(INITIAL_STATE)
@@ -21,4 +22,8 @@ export const roomReducer = reducerWithInitialState(INITIAL_STATE)
     .case(RoomActions.reducerIsInTheRoom, (state, payload) => {
         state.isInTheRoom = payload;
         return state
+    })
+    .case(RoomActions.reducerSetRoom, (state, room) => {
+       state.currentRoom = room
+       return state
     });
