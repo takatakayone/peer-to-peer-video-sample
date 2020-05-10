@@ -6,8 +6,6 @@ export class ApiClient {
     constructor(baseURL = '') {
         this.axiosInstance = axios.create({ baseURL });
         this.axiosInstance.defaults.headers.post['Content-Type'] = 'application/json;charset=utf-8';
-        this.axiosInstance.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
-        this.axiosInstance.defaults.withCredentials = true;
 
         this.axiosInstance.interceptors.request.use(
             async (config: AxiosRequestConfig) => {
