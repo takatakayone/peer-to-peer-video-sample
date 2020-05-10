@@ -9,6 +9,7 @@ import {RoomActions} from "../../actions/room";
 import {RouteComponentProps} from 'react-router-dom'
 import {PreparationVideo} from "./PreparationVideo";
 import {VideoActions} from "../../actions/video";
+import {ShareScreenButton} from "./footer/ShareScreenButton";
 
 type PageProps = {} & RouteComponentProps<{roomId: string}>;
 
@@ -61,7 +62,9 @@ export const Room: React.FC<PageProps> = (props) => {
                   <SubVideos streams={subVideoStreams}/>
                   }
               </SubVideosContainer>
-              <Footer>ROOOM</Footer>
+              <Footer>
+                  <ShareScreenButton/>
+              </Footer>
             </RoomContainer>
             }
         </Wrapper>
