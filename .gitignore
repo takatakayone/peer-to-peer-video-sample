@@ -3,3 +3,5 @@ auth_api/config/database.yml
 /.idea
 
 *.yml
+
+tmp
