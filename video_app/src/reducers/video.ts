@@ -5,7 +5,7 @@ import {VideoState} from "../types/video/video";
 
 const INITIAL_STATE: VideoState = {
     localVideoStream: null,
-    localShareScreenVideoStream: null,
+    localShareScreenStream: null,
     remoteVideoStreams: [],
     preparationVideoStream: null,
     mainVideoStream: null,
@@ -17,6 +17,14 @@ export const videoReducer = reducerWithInitialState(INITIAL_STATE)
         state.localVideoStream = stream;
         return state
     })
+    .case(VideoActions.reducerSetLocalShareScreenStream, (state, stream) => {
+        state.localShareScreenStream = stream;
+        return state
+    })
+    .case(VideoActions.reducerRemoveLocalShareScreenStream, (state, event) => {
+        state.localShareScreenStream = null;
+        return state
+    })
     .case(VideoActions.reducerSetRemoteVideoStreams, (state, remoteStreams) => {
         state.remoteVideoStreams = remoteStreams;
         return state
@@ -24,14 +32,6 @@ export const videoReducer = reducerWithInitialState(INITIAL_STATE)
     .case(VideoActions.reducerSetRemoteVideoStream, (state, stream) => {
        state.remoteVideoStreams.push(stream);
        return state
-    })
-    .case(VideoActions.reducerSetLocalShareScreenVideoStream, (state, stream) => {
-        state.localShareScreenVideoStream = stream;
-        return state
-    })
-    .case(VideoActions.reducerRemoveLocalShareScreenVideoStream, (state, stream) => {
-        state.localShareScreenVideoStream = null;
-        return state
     })
     .case(VideoActions.reducerSetPreparationVideoStream, (state, stream) => {
         state.preparationVideoStream = stream;

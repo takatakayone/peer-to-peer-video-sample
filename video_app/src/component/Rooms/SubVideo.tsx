@@ -15,8 +15,6 @@ export const SubVideo: React.FC<Props> = ({stream}) => {
             return;
         }
 
-        console.log("SUBVIDEO")
-
         if (stream.videoType === VideoType.RemoteVideo) {
             video.muted = false
         } else {

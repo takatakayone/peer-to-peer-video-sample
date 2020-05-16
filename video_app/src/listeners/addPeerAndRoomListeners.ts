@@ -2,6 +2,7 @@ import {Dispatch} from "redux";
 import Peer, {MeshRoom, RoomStream, SfuRoom} from "skyway-js";
 import {VideoActions} from "../actions/video";
 import {RoomActions} from "../actions/room";
+import {State} from "../reducers";
 
 let dispatch: Dispatch;
 
@@ -11,7 +12,7 @@ export const initializeDispatchForPeerAndRoomListeners = (dispatcher: Dispatch) 
 
 export const addPeerForCreatingRoomListeners = (peer: Peer, roomName: string) => {
     peer.on("open", () => {
-        peer.joinRoom(roomName, {mode: "mesh"});
+        peer.joinRoom(roomName, {mode: "sfu"});
         dispatch(RoomActions.reducerSetRoomUrl(`${roomName}`))
     });
 
@@ -25,7 +26,7 @@ export const addPeerForCreatingRoomListeners = (peer: Peer, roomName: string) =>
 
 export const addPeerForJoiningRoomListeners = (peer: Peer, roomName: string, localVideoStream: MediaStream) => {
   peer.on("open", () => {
-      const room: MeshRoom | SfuRoom= peer.joinRoom(roomName, {mode: "mesh", stream: localVideoStream});
+      const room: MeshRoom | SfuRoom= peer.joinRoom(roomName, {mode: "sfu", stream: localVideoStream});
       addRoomListeners(room);
   });
 
@@ -37,11 +38,11 @@ export const addPeerForJoiningRoomListeners = (peer: Peer, roomName: string, loc
 };
 
 const addRoomListeners = (room: MeshRoom | SfuRoom) => {
-
   room.on("data", ({src, data}) => {
-     console.log("SEND受信");
-     console.log(src);
-     console.log(data);
+      console.log("messageRecievied")
+      console.log(src)
+      console.log(data)
+     dispatch(RoomActions.messageReceived({peerId: src, eventName: data.eventName}));
   });
 
   room.once("open", () => {

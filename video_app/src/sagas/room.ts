@@ -1,24 +1,25 @@
-import { takeEvery, call, put, takeLatest, select } from 'redux-saga/effects';
-import { eventChannel, END } from 'redux-saga'
+import {call, put, select, takeEvery, takeLatest} from 'redux-saga/effects';
+import {END, eventChannel} from 'redux-saga'
 
 import {RoomActions} from "actions/room";
 import {AuthenticatePeerApi} from "../apiClient/authenticatePeer";
-import Peer, {MeshRoom, PeerCredential, RoomStream} from "skyway-js";
+import Peer, {PeerCredential, RoomStream, SfuRoom} from "skyway-js";
 
 import {VideoActions} from "../actions/video";
-import {addPeerForJoiningRoomListeners, addPeerForCreatingRoomListeners} from "../listeners/addPeerAndRoomListeners";
+import {addPeerForCreatingRoomListeners, addPeerForJoiningRoomListeners} from "../listeners/addPeerAndRoomListeners";
 import {State} from "../reducers";
-import {VideoMedia} from "../models/videoMedia";
-import {Room} from "../component/Rooms";
-import {addShareScreenMediaStreamListers} from "../listeners/mediaStreamListeners";
+import {VideoMedia, VideoType} from "../models/videoMedia";
+import {addShareScreenMediaStreamListeners} from "../listeners/mediaStreamListeners";
+import {MessageType} from "../types/room/room";
 
 const skyWayApiKey=`${process.env.REACT_APP_SKYWAY_API_KEY}`;
 
 // Selectors
 const selectorRemoteVideoStreams = (state: State) => state.video.remoteVideoStreams;
 const selectorLocalVideoStream = (state: State) => state.video.localVideoStream;
-const selectorLocalShareScreenVideoStream = (state: State) => state.video.localShareScreenVideoStream;
+const selectorLocalShareScreenVideoStream = (state: State) => state.video.localShareScreenStream;
 const selectorCurrentPeer = (state: State) => state.room.currentPeer;
+const selectorCurrentRoom = (state: State) => state.room.currentRoom;
 
 
 function* createRoom(action: ReturnType<typeof RoomActions.createRoom>) {
@@ -69,7 +70,7 @@ function* watchJoinRoomButtonClicked(action: ReturnType<typeof RoomActions.joinR
 
 function* watchLocalVideoStreamAdded(action: ReturnType<typeof VideoActions.localVideoStreamAdded>) {
     const localStream: MediaStream = action.payload;
-    const localVideoStream = new VideoMedia(localStream, null);
+    const localVideoStream = new VideoMedia(localStream, null, VideoType.LocalVideo);
     yield put(VideoActions.reducerSetLocalVideoStream(localVideoStream));
     yield put(VideoActions.reducerSetPreparationVideoStream(localVideoStream));
 }
@@ -83,7 +84,15 @@ function* watchJoinedTheRoom(action: ReturnType<typeof RoomActions.joinedTheRoom
 
 function* watchRemoteVideoStreamAdded(action: ReturnType<typeof VideoActions.remoteVideoStreamAdded>) {
     const remoteStream: RoomStream = action.payload;
-    const remoteVideoMedia: VideoMedia = new VideoMedia(remoteStream, remoteStream.peerId);
+    const remoteVideoMedia: VideoMedia = new VideoMedia(remoteStream, remoteStream.peerId, VideoType.RemoteVideo);
+
+    // shareをしている場合はそれを新しく入ってきたデバイスに通知する
+    const room = yield select(selectorCurrentRoom);
+    const localShareVideo = yield select(selectorLocalShareScreenVideoStream);
+    if (localShareVideo) {
+        room.send({"eventName": "shareScreen"})
+    }
+
     yield put(VideoActions.reducerSetRemoteVideoStream(remoteVideoMedia));
     yield call(setMainAndSubVideoStream);
 }
@@ -98,74 +107,102 @@ function* watchRemoteVideoStreamRemoved(action: ReturnType<typeof VideoActions.r
 }
 
 function* watchShareScreenButtonClicked(action: ReturnType<typeof VideoActions.shareScreenButtonClicked>) {
-   const localShareScreenStream: MediaStream = action.payload;
-   const localShareScreenVideoMedia: VideoMedia = new VideoMedia(localShareScreenStream, null);
-   yield put(VideoActions.reducerSetLocalShareScreenVideoStream(localShareScreenVideoMedia));
-   yield call(addShareScreenMediaStreamListers, localShareScreenStream);
+    const shareScreenMediaStream: MediaStream = action.payload;
+    const peer: Peer = yield select(selectorCurrentPeer);
 
-   yield call(setMainAndSubVideoStream);
+    const localShareScreenStream = new VideoMedia(shareScreenMediaStream, peer.id, VideoType.LocalVideo);
+    yield put(VideoActions.reducerSetLocalShareScreenStream(localShareScreenStream));
+
+    // roomのmediaStreamをShareScreenに変更
+    const room: SfuRoom = yield select(selectorCurrentRoom);
+    room.replaceStream(localShareScreenStream.mediaStream);
+
+    // ここでremote
+    room.send({"eventName": "shareScreen"});
+
+    yield call(addShareScreenMediaStreamListeners, shareScreenMediaStream);
+    yield call(setMainAndSubVideoStream);
 }
 
 function* watchLocalShareScreenEnded(action: ReturnType<typeof VideoActions.localShareScreenEnded>) {
-   const localShareScreenMediaStream: MediaStream = action.payload;
-   yield put(VideoActions.reducerRemoveLocalShareScreenVideoStream(localShareScreenMediaStream));
-   yield call(setMainAndSubVideoStream);
+    // localShareScreenをnullにする
+    yield put(VideoActions.reducerRemoveLocalShareScreenStream("removeShareScreen"));
+
+    const room: SfuRoom = yield select(selectorCurrentRoom);
+    const localVideo: VideoMedia = yield select(selectorLocalVideoStream);
+    room.replaceStream(localVideo.mediaStream);
+
+    yield call(setMainAndSubVideoStream);
+}
+
+function* watchMessageReceived(action: ReturnType<typeof RoomActions.messageReceived>) {
+    const message: MessageType = action.payload;
+    switch (message.eventName) {
+        case "shareScreen":
+           yield call(remoteShareScreenStarted, message.peerId);
+        default:
+            return;
+    }
+}
+
+function* remoteShareScreenStarted(peerId: string) {
+    const remoteVideoStreams: VideoMedia[] = yield select(selectorRemoteVideoStreams);
+    remoteVideoStreams.forEach(remoteVideoStream => {
+        // 一旦全てreset
+        remoteVideoStream.resetMainScreen();
+        if (remoteVideoStream.peerId === peerId) {
+            remoteVideoStream.setMainScreen()
+        }
+    });
+    yield call(setMainAndSubVideoStream);
 }
 
 function* setMainAndSubVideoStream() {
     const localVideoStream: VideoMedia = yield select(selectorLocalVideoStream);
-    const localShareScreenVideoStream: VideoMedia = yield select(selectorLocalShareScreenVideoStream);
+    const localShareScreenStream: VideoMedia = yield select(selectorLocalShareScreenVideoStream);
     const remoteVideoStreams: VideoMedia[] = yield select(selectorRemoteVideoStreams);
 
-    // remoteVideoStreamsが存在しない場合はmain画面をlocalVideoStreamにする
-    // ①remoteVideoStreamsが存在していない、LocalVideoStreamのみ存在している =>LocalVideoStreamをMain画面に
-    // ②remoteVideoStreamsが存在していない、LocalVideoStreamとLocalShareScreenStreamが存在している => LocalShareScreenStreamをMain画面に。LocalVideoStreamをSub画面に
-    // ③remoteVideoStreamsが存在している、LocalShareScreenStreamが存在していない => remoteVideoStreamのうち最初のやつをmain画面にset
-    // ④remoteVideoStreamsが存在している、LocalShareScreenStreamが存在している => Main画面にLocalSHareScreenStreamをSet、それ以外は全てSub画面に
-    // ⑤remoteVideoStreamsが存在している、その中でShareScreenStreamが存在している＝＞ Main画面にShareScreenStreamをSet、それ以外は全てSub画面に
-    // ⑥ピン留め
-
+    // ①: remoteVideoStreamsが無く、localVideoStreamがlocalVideo/shareScreenVideoの時=> localVideoStreamをMainに
+    // ②: remoteVideoStreamsがあり、localShareScreenが存在する時=> localVideoStreamをMainに, remoteVideoStreamsをSubに
+    // ③: remoteVideoStreamsがあり、localVideoStreamがlocalVideoの時=> remoteVideoStreamの最初をMain/localVideoStreamをSubの最初に、そのほかをSubに
+    // ④: screenShareをremoteが始めた場合＝＞一番最後にShareをした画面がMainに、それ以外をSubに
     if (remoteVideoStreams.length === 0) {
-        console.log("LOCAL SHARE SCREEEEEEN")
-        console.log(localShareScreenVideoStream)
-        if (localShareScreenVideoStream == null) {
-            // ケース①
-            yield put(VideoActions.reducerSetMainVideoStream(localVideoStream));
-            yield put(VideoActions.reducerSetSubVideoStreams([]));
-        }　else {
-            // ケース②
-            yield put(VideoActions.reducerSetMainVideoStream(localShareScreenVideoStream));
-            yield put(VideoActions.reducerSetSubVideoStreams([localVideoStream]));
-        }
-
+        // ケース①
+        yield put(VideoActions.reducerSetMainVideoStream(localShareScreenStream ? localShareScreenStream : localVideoStream));
+        yield put(VideoActions.reducerSetSubVideoStreams([]));
     } else {
 
-        if (localShareScreenVideoStream == null) {
-            //ケース③
-            // remoteVideoStreamで最初のやつをmain画面にset
-            // localVideoStreamはsubViewの最初にset
-            const mainRemoteVideoStream = remoteVideoStreams[0];
-            yield put(VideoActions.reducerSetMainVideoStream(mainRemoteVideoStream));
-            const subVideoStreams: VideoMedia[] = [];
-            subVideoStreams.push(localVideoStream);
-            remoteVideoStreams.forEach((remoteVideoStream: VideoMedia, index: number) => {
-                if (index !== 0) {
-                    subVideoStreams.push(remoteVideoStream)
-                }
-            });
-            yield put(VideoActions.reducerSetSubVideoStreams(subVideoStreams));
+        if (localShareScreenStream) {
+          // ケース②
+          yield put(VideoActions.reducerSetMainVideoStream(localShareScreenStream));
+          yield put(VideoActions.reducerSetSubVideoStreams(remoteVideoStreams));
+
         } else {
-            // ケース④
-            yield put(VideoActions.reducerSetMainVideoStream(localShareScreenVideoStream));
-            let subVideoStreams: VideoMedia[] = [];
-            subVideoStreams = remoteVideoStreams;
-            subVideoStreams.push(localVideoStream);
-            yield put(VideoActions.reducerSetSubVideoStreams(subVideoStreams));
+            const remoteMainShareScreenStream = remoteVideoStreams.filter(remoteStream => remoteStream.isMainScreen)[0];
+            if (remoteMainShareScreenStream) {
+                // ケース④
+                yield put(VideoActions.reducerSetMainVideoStream(remoteMainShareScreenStream));
+                const subVideoStreams = remoteVideoStreams.filter(remoteStream => !remoteStream.isMainScreen);
+                subVideoStreams.push(localVideoStream);
+                yield put(VideoActions.reducerSetSubVideoStreams(subVideoStreams));
+            } else {
+                // ケース③
+                // remoteVideoStreamで最初のやつをmain画面にset
+                // localVideoStreamはsubViewの最初にset
+                const mainRemoteVideoStream = remoteVideoStreams[0];
+                yield put(VideoActions.reducerSetMainVideoStream(mainRemoteVideoStream));
+                const subVideoStreams: VideoMedia[] = [];
+                subVideoStreams.push(localVideoStream);
+                remoteVideoStreams.forEach((remoteVideoStream: VideoMedia, index: number) => {
+                    if (index !== 0) {
+                        subVideoStreams.push(remoteVideoStream)
+                    }
+                });
+                yield put(VideoActions.reducerSetSubVideoStreams(subVideoStreams));
+            }
         }
 
     }
-
-
 }
 
 function createPeer(peerId: string, peerCredential: PeerCredential): Peer {
@@ -184,6 +221,7 @@ export function* RoomSaga() {
     yield takeLatest(RoomActions.createRoom, createRoom);
     yield takeLatest(RoomActions.joinRoomButtonClicked, watchJoinRoomButtonClicked);
     yield takeLatest(RoomActions.joinedTheRoom, watchJoinedTheRoom);
+    yield takeLatest(RoomActions.messageReceived, watchMessageReceived);
     yield takeLatest(VideoActions.shareScreenButtonClicked, watchShareScreenButtonClicked);
     yield takeLatest(VideoActions.localShareScreenEnded, watchLocalShareScreenEnded);
     yield takeLatest(VideoActions.localVideoStreamAdded, watchLocalVideoStreamAdded);

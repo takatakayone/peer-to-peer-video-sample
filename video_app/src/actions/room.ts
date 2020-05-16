@@ -1,6 +1,7 @@
 import actionCreatorFactory from 'typescript-fsa';
 import {JoinRoomInfo, MakePeerConnectionInfo, PeerAuthenticationInfo} from "../types/peer/types";
 import Peer, {MeshRoom, SfuRoom} from "skyway-js";
+import {MessageType} from "../types/room/room";
 
 const actionCreator = actionCreatorFactory('Room');
 
@@ -12,4 +13,5 @@ export const RoomActions = {
     createRoom: actionCreator<PeerAuthenticationInfo>('createRoom'),
     joinRoomButtonClicked: actionCreator<JoinRoomInfo>('joinRoomButtonClicked'),
     joinedTheRoom: actionCreator<MeshRoom | SfuRoom>('joinedTheRoom'),
+    messageReceived: actionCreator<MessageType>('messageReceived'),
 };
