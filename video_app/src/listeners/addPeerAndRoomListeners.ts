@@ -5,7 +5,7 @@ import {RoomActions} from "../actions/room";
 
 let dispatch: Dispatch;
 
-export const initializeDispatchAndState = (dispatcher: Dispatch) => {
+export const initializeDispatchForPeerAndRoomListeners = (dispatcher: Dispatch) => {
     dispatch = dispatcher;
 };
 

@@ -11,5 +11,5 @@ export const RoomActions = {
     reducerIsInTheRoom: actionCreator<boolean>('reducerIsInTheRoom'),
     createRoom: actionCreator<PeerAuthenticationInfo>('createRoom'),
     joinRoomButtonClicked: actionCreator<JoinRoomInfo>('joinRoomButtonClicked'),
-    joinedTheRoom: actionCreator<MeshRoom | SfuRoom>('joinedTheRoom')
+    joinedTheRoom: actionCreator<MeshRoom | SfuRoom>('joinedTheRoom'),
 };

@@ -6,10 +6,12 @@ import { ConnectedRouter } from "connected-react-router";
 import { configureStore, history } from "./configureStore";
 
 import routes from './routes';
-import {initializeDispatchAndState} from "./listeners/addPeerAndRoomListeners";
+import {initializeDispatchForPeerAndRoomListeners} from "./listeners/addPeerAndRoomListeners";
+import {initializeDispatchForMediaStreamListeners} from "./listeners/mediaStreamListeners";
 
 const store = configureStore();
-initializeDispatchAndState(store.dispatch);
+initializeDispatchForPeerAndRoomListeners(store.dispatch);
+initializeDispatchForMediaStreamListeners(store.dispatch);
 
 ReactDOM.render(
     <Provider store={store}>

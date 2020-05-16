@@ -9,9 +9,13 @@ export const VideoActions = {
     reducerSetPreparationVideoStream: actionCreator<VideoMedia>('reducerSetPreparationVideoStream'),
     reducerSetRemoteVideoStream: actionCreator<VideoMedia>('reducerSetRemoteVideoStream'),
     reducerSetRemoteVideoStreams: actionCreator<VideoMedia[]>('reducerSetRemoteVideoStreams'),
+    reducerSetLocalShareScreenVideoStream: actionCreator<VideoMedia>('reducerSetLocalShareScreenVideoStream'),
+    reducerRemoveLocalShareScreenVideoStream: actionCreator<MediaStream>('reducerRemoveLocalShareScreenVideoStream'),
     reducerSetMainVideoStream: actionCreator<VideoMedia>('reducerSetMainVideoStream'),
     reducerSetSubVideoStreams: actionCreator<VideoMedia[]>('reducerSetSubVideoStreams'),
     localVideoStreamAdded: actionCreator<MediaStream>('localVideoStreamAdded'),
     remoteVideoStreamAdded: actionCreator<RoomStream>('remoteVideoStreamAdded'),
     remoteVideoStreamRemoved: actionCreator<string>('remoteVideoStreamRemoved'),
+    shareScreenButtonClicked: actionCreator<MediaStream>('shareScreenButtonClicked'),
+    localShareScreenEnded: actionCreator<MediaStream>('localShareScreenEnded'),
 };

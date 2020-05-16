@@ -1,22 +1,21 @@
 import React, {useCallback} from "react";
 import styled from "styled-components";
 import {useDispatch} from "react-redux";
+import {VideoActions} from "../../../actions/video";
 
 export const ShareScreenButton: React.FC = () => {
     const dispatch = useDispatch();
 
     const shareScreenButtonClicked = useCallback(() => {
         startCapture().then((stream: MediaStream) => {
-
+            dispatch(VideoActions.shareScreenButtonClicked(stream));
         }).catch(err => {
             console.log(err)
         });
-
     }, [dispatch]);
 
     async function startCapture() {
         let captureStream = null;
-
         try {
             captureStream = await (navigator.mediaDevices as any).getDisplayMedia({video: true});
         } catch(err) {
