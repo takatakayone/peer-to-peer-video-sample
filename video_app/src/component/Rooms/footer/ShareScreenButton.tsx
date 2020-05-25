@@ -17,7 +17,7 @@ export const ShareScreenButton: React.FC = () => {
     async function startCapture() {
         let captureStream = null;
         try {
-            captureStream = await (navigator.mediaDevices as any).getDisplayMedia({video: true});
+            captureStream = await (navigator.mediaDevices as any).getDisplayMedia({video: true, audio: true});
         } catch(err) {
             console.error("Error: " + err);
         }
