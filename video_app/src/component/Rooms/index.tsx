@@ -32,30 +32,6 @@ export const Room: React.FC<PageProps> = (props) => {
             }).catch(err => console.log(err));
     }, [dispatch]);
 
-
-    // useEffect(() => {
-    //     startCapture().then((stream: MediaStream) => {
-    //         console.log("STREAM:")
-    //         console.log(stream.getVideoTracks())
-    //     }).catch(err => {
-    //         console.log(err)
-    //     });
-    // }, [dispatch]);
-    //
-    //
-    // async function startCapture() {
-    //     let captureStream = null;
-    //
-    //     try {
-    //         captureStream = await (navigator.mediaDevices as any).getDisplayMedia({video: true});
-    //     } catch(err) {
-    //         console.error("Error: " + err);
-    //     }
-    //     return captureStream;
-    // }
-
-
-
     const joinRoomButtonClicked = useCallback(() => {dispatch(RoomActions.joinRoomButtonClicked({sessionToken: sessionToken, roomName: props.match.params.roomId}))} ,[dispatch, sessionToken, props.match.params.roomId]);
 
     return (
